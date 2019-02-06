@@ -13,7 +13,7 @@ import javafx.stage.Stage;
  * @author Nada
  */
 public class Client extends Application {
-
+    
     @Override
     public void start(Stage primaryStage) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
