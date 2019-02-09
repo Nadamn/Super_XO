@@ -1,6 +1,12 @@
 package client;
 
+import java.io.DataInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
@@ -30,9 +36,11 @@ import javafx.scene.layout.HBox;
 //import static javafx.scene.paint.Color.SKYBLUE;
 //import javafx.stage.Screen;
 import javafx.stage.Stage;
+import server.Request;
 
 public class Client extends Application implements EventHandler<ActionEvent> {
 
+    //---------------------------------variables for landing and signin windows-----------------------------------------------------------------------
     Button signUpButton;
     Button signInButton;
     Scene landingWindowScene;
@@ -50,10 +58,53 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     HBox hbButtons;
     Scene currentScene;
     Stage ps;
+    
+    //---------------------------------variables for landing and signin windows-----------------------------------------------------------------------
+    Socket mySocket;
+    PrintStream printStream;
+    DataInputStream dataInStream;
+    
+    public Boolean connectToServer(){
+        Boolean success;
+        try {
+            mySocket = new Socket("127.0.0.1", 5005);
+            dataInStream = new DataInputStream(mySocket.getInputStream());
+            printStream = new PrintStream(mySocket.getOutputStream());
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    try {
+                        System.out.println(dataInStream.readLine()+"\n");
+                    } catch (IOException ex) {
+                        try {
+                            //that's when the server is closed
+                            printStream.close();
+                            dataInStream.close();
+                            mySocket.close();
+                            System.out.println("Server closed");
+                        } catch (IOException ex1) {
+                            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex1);
+                        }
+                    }
+                }
+            }
+        }).start();
+        return true;
+    }
 
     @Override
     public void start(Stage primaryStage) throws FileNotFoundException {
         ps = primaryStage;
+        if ( ! connectToServer() ){
+            System.out.println("Couldn't connect to server");
+            System.exit(0);
+            return;
+        }
         landingWinInit();
         signInWinInit();
         primaryStage.setTitle("TicTacToe");
@@ -119,10 +170,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e) {
         if (e.getSource() == signInSubmitButton) {
-            /**
-             * code here*
-             */
             System.out.println("Submit");
+            String [] fields = {userameTextFld.getText(), passwordFld.getText()};
+            Request request = new Request("signin", fields , null, null);
+            printStream.print(request);
         } else if (e.getSource() == signInBackButton) {
             ps.setScene(landingWindowScene);
         } else if (e.getSource() == signInClearButton) {
