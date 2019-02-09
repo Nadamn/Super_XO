@@ -41,7 +41,7 @@ public class Server extends Application {
     //players from db
     private DBManager db = new DBManager();
     private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
-    
+   
     static String[] ar;
     Color red = Color.RED;
     Color green = Color.CHARTREUSE;
