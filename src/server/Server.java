@@ -46,8 +46,12 @@ public class Server extends Application {
     Color red = Color.RED;
     Color green = Color.CHARTREUSE;
     Color gray = Color.LIGHTGREY;
-    String users[] =  new String[]{ "Abdelrahman" , "Bahaa" , "David" , "Mostafa" , "Nada"};
-    int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
+    ArrayList<String> users = new ArrayList();
+    ArrayList<Integer> status = new ArrayList();
+    
+    
+    //String users[] =  new String[]{ "Abdelrahman" , "Bahaa" , "David" , "Mostafa" , "Nada"};
+    //int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
     ServerLogic myServ ;
     
     private Color state(int s){
@@ -103,11 +107,11 @@ public class Server extends Application {
             vbox.getChildren().add(title);
 
             ArrayList<Hyperlink> options = new ArrayList();
-            for (int i=0; i< users.length; i++) {
-                options.add(new Hyperlink(users[i]));
+            for (int i=0; i< users.size(); i++) {
+                options.add(new Hyperlink(users.get(i)));
             }
             
-            for (int i=0; i<users.length; i++) {
+            for (int i=0; i<users.size(); i++) {
                 VBox.setMargin(options.get(i), new Insets(0, 0, 0, 8));
                 vbox.getChildren().add(options.get(i));
             }
@@ -125,11 +129,11 @@ public class Server extends Application {
             vbox.getChildren().add(title);
             
             ArrayList<Circle> options = new ArrayList();
-            for (int i=0; i< users.length; i++) {
-                options.add(new Circle(6,state(status[i])));
+            for (int i=0; i< users.size(); i++) {
+                options.add(new Circle(6,state(status.get(i))));
             }
             
-            for (int i=0; i<users.length; i++) {
+            for (int i=0; i<users.size(); i++) {
                 VBox.setMargin(options.get(i), new Insets(4, 0, 8, 15));
                 vbox.getChildren().add(options.get(i));
             }
@@ -140,6 +144,10 @@ public class Server extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        for( int j=0 ; j < allPlayers.size() ;j++ ){
+            users.add( allPlayers.get(j).getName() );
+            status.add( allPlayers.get(j).getStatus());        
+        }
         
         /*
         Button btn = new Button();
