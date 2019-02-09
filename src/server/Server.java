@@ -44,7 +44,7 @@ public class Server extends Application {
     Color gray = Color.LIGHTGREY;
     String users[] =  new String[]{ "Abdelrahman" , "Bahaa" , "David" , "Mostafa" , "Nada"};
     int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
-    ServerBussiness myServ ;
+    ServerLogic myServ ;
     
     private Color state(int s){
         switch (s){
@@ -162,7 +162,7 @@ public class Server extends Application {
         primaryStage.setTitle("X_O Server");
         primaryStage.setScene(scene);
         primaryStage.show();
-        myServ = new ServerBussiness();
+        myServ = new ServerLogic();
         
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
             public void handle( WindowEvent close){
