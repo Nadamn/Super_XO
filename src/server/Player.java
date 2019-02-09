@@ -16,6 +16,7 @@ public class Player {
     private String name;
     private int score;
     private int status;
+    
 
     public Player(String username, String password, String name) {
         this.username = username;
@@ -55,5 +56,7 @@ public class Player {
     public void setStatus(int status){
         this.status= status;
     }
+    
+    
     
 }

@@ -43,7 +43,8 @@ import javafx.stage.WindowEvent;
 import server.Request;
 
 public class Client extends Application implements EventHandler<ActionEvent> {
-
+    // variable for request object
+    Request req;
     //---------------------------------variables for landing and signin windows-----------------------------------------------------------------------
     Button signUpButton;
     Button signInButton;
@@ -78,7 +79,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             mySocket = new Socket("127.0.0.1", 7000);
             System.out.println("step-1");
             printStream = new ObjectOutputStream(mySocket.getOutputStream());
-            
             System.out.println("step--1");
             dataInStream = new ObjectInputStream(mySocket.getInputStream());
             System.out.println("step1");
@@ -98,7 +98,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         System.out.println("step3");
                         try {
                             r = (Request) dataInStream.readObject();
-                            System.out.println(r.getMsg()[0]+"\n");
+                            //System.out.println(r.getMsg()[0]+"\n");
                             System.out.println("asds\n");
                         } catch (ClassNotFoundException ex) {
                             
@@ -165,8 +165,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         signUpButton.setOnAction((EventHandler<ActionEvent>) this);
 
         signInButton = new Button("Sign In");
-
         signInButton.setOnAction((EventHandler<ActionEvent>) this);
+        
         landingWindowGridPane = new GridPane();
         landingWindowGridPane.setId("grid1");
         landingWindowGridPane.setAlignment(Pos.CENTER);
@@ -219,9 +219,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         if (e.getSource() == signInSubmitButton) {
             System.out.println("Submit");
             String [] fields = {userameTextFld.getText(), passwordFld.getText()};
-            Request request = new Request("signin", fields , null, null);
+            //Request request = new Request("signin", fields , null, null);
+            //sending signIn request
+            req.setRequestType("signInSubmit");
+            req.setUserName(userameTextFld.getText());
+            req.setPassWord(passwordFld.getText());
             try {
-                printStream.writeObject(request);
+                printStream.writeObject(req);
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
