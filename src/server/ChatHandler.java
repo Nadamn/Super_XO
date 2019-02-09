@@ -7,6 +7,8 @@ package server;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Vector;
@@ -22,8 +24,8 @@ import java.util.logging.Logger;
 
 class ChatHandler extends Thread {
 
-    DataInputStream dis;
-    PrintStream ps;
+    ObjectInputStream dis;
+    ObjectOutputStream ps;
     static Vector<ChatHandler> clients = new Vector<ChatHandler>();
     Socket s;
     static boolean finish;
@@ -31,8 +33,8 @@ class ChatHandler extends Thread {
         
         try{
         s = mys;
-        dis = new DataInputStream(mys.getInputStream());
-        ps = new PrintStream(mys.getOutputStream());
+        dis = new ObjectInputStream(mys.getInputStream());
+        ps = new ObjectOutputStream(mys.getOutputStream());
         clients.add(this);
         finish = false;
         start();
@@ -53,11 +55,17 @@ class ChatHandler extends Thread {
         while(!finish)
         {
             try{
-                    String mess = dis.readLine();
+                    Request mess = (Request) dis.readObject();
                     if( mess == null )
                     {
                         throw new Exception("null");
                     }
+                    
+                    // check mess type by switch case 
+                    // case "signin"
+                    // 
+                   
+                    
                     sendToAll(mess);
                     //System.out.println("send been called");
             }
@@ -69,7 +77,7 @@ class ChatHandler extends Thread {
                     dis.close();
                     clients.remove(this);
                     s.close();
-                    sendToAll("client removed");
+                    //sendToAll("client removed");
                     break;
                 } catch (IOException ex) {
                     Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -78,10 +86,11 @@ class ChatHandler extends Thread {
         }
     }
     
-    public void sendToAll(String mess){
+    public void sendToAll(Request mess) throws IOException{
         
         for( ChatHandler ch : clients){
-            ch.ps.println(mess);
+            System.out.println("sent");
+            ch.ps.writeObject(mess);
         } 
     }
 

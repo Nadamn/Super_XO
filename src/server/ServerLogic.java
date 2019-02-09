@@ -39,7 +39,7 @@ public class ServerLogic extends Thread{
     
         try{
             
-            myserver = new ServerSocket(5005);
+            myserver = new ServerSocket(7000);
             while(!finish){
                 System.out.println("hell");
                 Socket s = myserver.accept();

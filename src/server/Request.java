@@ -5,11 +5,13 @@
  */
 package server;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Mostafa
  */
-public class Request {
+public class Request implements Serializable {
     
     private String requestType;
     private String [] msg;

@@ -1,8 +1,11 @@
 package client;
 
+import java.io.*;
 import java.io.DataInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -36,6 +39,7 @@ import javafx.scene.layout.HBox;
 //import static javafx.scene.paint.Color.SKYBLUE;
 //import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import server.Request;
 
 public class Client extends Application implements EventHandler<ActionEvent> {
@@ -58,28 +62,51 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     HBox hbButtons;
     Scene currentScene;
     Stage ps;
+    boolean finish;
+    Thread clientListner;
     
     //---------------------------------variables for landing and signin windows-----------------------------------------------------------------------
     Socket mySocket;
-    PrintStream printStream;
-    DataInputStream dataInStream;
+    ObjectOutputStream printStream;
+    ObjectInputStream dataInStream;
     
     public Boolean connectToServer(){
         Boolean success;
+        finish = false;
         try {
-            mySocket = new Socket("127.0.0.1", 5005);
-            dataInStream = new DataInputStream(mySocket.getInputStream());
-            printStream = new PrintStream(mySocket.getOutputStream());
+            System.out.println("step0");
+            mySocket = new Socket("127.0.0.1", 7000);
+            System.out.println("step-1");
+            printStream = new ObjectOutputStream(mySocket.getOutputStream());
+            
+            System.out.println("step--1");
+            dataInStream = new ObjectInputStream(mySocket.getInputStream());
+            System.out.println("step1");
         } catch (IOException ex) {
+            System.out.println("hereeeee");
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-        new Thread(new Runnable() {
+        
+        Thread clientListner = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true){
                     try {
-                        System.out.println(dataInStream.readLine()+"\n");
+                        System.out.println("step2");
+                        Request r;
+                        System.out.println("step3");
+                        try {
+                            r = (Request) dataInStream.readObject();
+                            System.out.println(r.getMsg()[0]+"\n");
+                            System.out.println("asds\n");
+                        } catch (ClassNotFoundException ex) {
+                            
+                            System.out.println("here1");
+                            break;
+                            //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
                     } catch (IOException ex) {
                         try {
                             //that's when the server is closed
@@ -88,12 +115,14 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                             mySocket.close();
                             System.out.println("Server closed");
                         } catch (IOException ex1) {
+                            System.out.println("here2");
                             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex1);
                         }
-                    }
+                    } 
                 }
             }
-        }).start();
+        });
+        clientListner.start();
         return true;
     }
 
@@ -110,6 +139,24 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         primaryStage.setTitle("TicTacToe");
         ps.setScene(currentScene);
         ps.show();
+        
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
+            public void handle( WindowEvent close){
+                System.out.println("client closed");
+                try{
+                    clientListner.stop();
+                    mySocket.close();
+                    printStream.close();
+                    dataInStream.close();
+                    System.exit(0);
+
+                }catch( Exception e){
+                    System.out.println("exc");
+                    System.exit(0);
+                     e.printStackTrace();
+                }
+            }
+        });
 
     }
 
@@ -173,7 +220,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             System.out.println("Submit");
             String [] fields = {userameTextFld.getText(), passwordFld.getText()};
             Request request = new Request("signin", fields , null, null);
-            printStream.print(request);
+            try {
+                printStream.writeObject(request);
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else if (e.getSource() == signInBackButton) {
             ps.setScene(landingWindowScene);
         } else if (e.getSource() == signInClearButton) {
