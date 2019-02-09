@@ -9,6 +9,7 @@ package server;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Vector;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
@@ -37,6 +38,9 @@ import javafx.stage.WindowEvent;
 
 public class Server extends Application {
    
+    //players from db
+    private DBManager db = new DBManager();
+    private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
     
     static String[] ar;
     Color red = Color.RED;
