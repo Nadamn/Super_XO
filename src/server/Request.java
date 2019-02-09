@@ -11,19 +11,15 @@ package server;
  */
 public class Request {
     
-    String msg;
+    String requestType;
+    String [] msg;
     Player sender;
     String receiverUserName;
     
-    public Request(String msg,Player sender,String receiverUserName){
+    public Request(String requestType, String [] msg,Player sender,String receiverUserName){
+        this.requestType = requestType;
         this.msg=msg;
         this.sender=sender;
         this.receiverUserName=receiverUserName;
-    }
-    
-    
-    
-    
-    
-    
+    } 
 }
