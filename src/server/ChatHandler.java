@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.shape.Circle;
 
 /**
  *
@@ -64,6 +65,25 @@ class ChatHandler extends Thread {
                     // check mess type by switch case 
                     // case "signin"
                     // 
+                    if( mess.getMsg().equals("signin") ){
+                        for (int i=0; i< Server.myServ.users.size(); i++) {
+                            if( Server.myServ.users.get(i).equals(mess.getMsg()[0])){
+                                if( Server.myServ.passwords.get(i).equals(mess.getMsg()[1])){
+                                        
+                                    // return true 
+                                }
+                                else{
+                                    //return false worng password
+                                }
+                            }
+                            
+                        }
+                        
+                        //return false user not found
+                        
+                    }
+                    
+                    
                    
                     
                     sendToAll(mess);

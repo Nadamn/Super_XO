@@ -48,11 +48,12 @@ public class Server extends Application {
     Color gray = Color.LIGHTGREY;
     ArrayList<String> users = new ArrayList();
     ArrayList<Integer> status = new ArrayList();
+    ArrayList<String> passwords = new ArrayList();
     
     
     //String users[] =  new String[]{ "Abdelrahman" , "Bahaa" , "David" , "Mostafa" , "Nada"};
     //int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
-    ServerLogic myServ ;
+    static ServerLogic myServ ;
     
     private Color state(int s){
         switch (s){
@@ -146,20 +147,11 @@ public class Server extends Application {
     public void start(Stage primaryStage) {
         for( int j=0 ; j < allPlayers.size() ;j++ ){
             users.add( allPlayers.get(j).getName() );
-            status.add( allPlayers.get(j).getStatus());        
+            status.add( allPlayers.get(j).getStatus());  
+            passwords.add(allPlayers.get(j).getPassWord());
         }
         
-        /*
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-        */
+        
         
 
         BorderPane border = new BorderPane();
@@ -174,7 +166,7 @@ public class Server extends Application {
         primaryStage.setTitle("X_O Server");
         primaryStage.setScene(scene);
         primaryStage.show();
-        myServ = new ServerLogic();
+        myServ = new ServerLogic( users , status , passwords);
         
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
             public void handle( WindowEvent close){

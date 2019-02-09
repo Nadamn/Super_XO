@@ -7,6 +7,7 @@ package server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  *
@@ -16,8 +17,17 @@ import java.net.Socket;
 
 public class ServerLogic extends Thread{
     
+    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  ){
+        users = u;
+        status = s;
+        passwords = p;
+    }
+    
     public ServerSocket myserver ;
     boolean finish;
+    ArrayList<String> users  ;
+    ArrayList<Integer> status ;
+    ArrayList<String> passwords ;
     
     public ServerLogic(){
         
