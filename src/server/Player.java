@@ -13,19 +13,21 @@ public class Player {
     private int id;
     private String username;
     private String password;
-    private String name;
-    private int score;
+    private int score =0;
     private int status;
     
 
-    public Player(String username, String password, String name) {
+    public Player(String username, String password) {
         this.username = username;
         this.password = password;
-        this.name = name;
     }
     
     public int getId(){
         return this.id;
+    }
+   
+    public void setId(int id){
+        this.id = id ;
     }
     
     public String getUsername(){
@@ -34,11 +36,6 @@ public class Player {
     
     public String getPassWord(){
         return this.password;
-    }
-    
-    
-    public String getName(){
-        return this.name;
     }
     
     public int getScore(){

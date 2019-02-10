@@ -146,7 +146,7 @@ public class Server extends Application {
     @Override
     public void start(Stage primaryStage) {
         for( int j=0 ; j < allPlayers.size() ;j++ ){
-            users.add( allPlayers.get(j).getName() );
+            users.add( allPlayers.get(j).getUsername() );
             status.add( allPlayers.get(j).getStatus());  
             passwords.add(allPlayers.get(j).getPassWord());
         }
