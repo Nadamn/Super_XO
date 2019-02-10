@@ -6,10 +6,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -21,11 +24,23 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import server.Player;
@@ -60,6 +75,12 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     ObjectInputStream dataInStream;
     ArrayList<String> users ;
     ArrayList<Integer> status ;
+    String errorMessage = "";
+    
+    //---------------------------------variables for main window --------------------------------------------------
+    Scene mainWindowScene;
+    Boolean mainWinFlag= false;
+    Thread currentThread = Thread.currentThread();
     
     public Boolean connectToServer(){
         Boolean success;
@@ -83,22 +104,18 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             public void run() {
                 while (true){
                     try {
-                        System.out.println("step2");
                         Response r;
-                        System.out.println("step3");
                         try {
-                            r = (Response) dataInStream.readObject();
-                            
-                            if ( r.getReponseType().equals("signin")) { 
-                                
+                            r = (Response) dataInStream.readObject();                            
+                            if ( r.getReponseType().equals("signin")) {                                 
                                     if( r.getReponseStatus()){
                                         System.out.println("login success");
-                                        //r.getUsers()
-                                        //r.getStatus()         success             
                                     }
                                     else{
                                         System.out.println("invalid user information");
                                         System.out.println(r.getMessage());
+                                        errorMessage = r.getMessage()+" please try again";
+                                        System.out.println(errorMessage);
                                     }
                             
                             }
@@ -128,9 +145,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             }
         });
         clientListner.start();
+        
         return true;
     }
-    //--------------------------------- Start ---------------------------------------------------
+//    //--------------------------------- Start ---------------------------------------------------
     @Override
     public void start(Stage primaryStage) throws FileNotFoundException {
         ps = primaryStage;
@@ -140,8 +158,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             return;
         }
         landingWinInit();
-        signInWinInit();
-        gameWinInit();
+//        signInWinInit();
+//        initMainWindow();
+//        gameWinInit();
         
         primaryStage.setTitle("TicTacToe");
         //currentScene=gameScene;  // Un comment this to test game windows
@@ -195,6 +214,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         //landingWindowScene.getStylesheets().add(Client.class.getResource("tictaktoe.css").toExternalForm());
         currentScene = landingWindowScene;
     }
+    
     // Game win init
     public void gameWinInit(){
         BorderPane borderPane;
@@ -258,7 +278,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         Label passwordLabel;
         //PasswordField passwordFld;
         BorderPane signInWindowBorderPane;
-        HBox hbButtons;
+        HBox hbButtons;        
+        TextField errorMessageFld = new TextField(errorMessage);
+        
         usernameLabel = new Label("User Name");
         passwordLabel = new Label("Password");
         
@@ -292,13 +314,112 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         SignInGridPane.add(passwordLabel, 0, 1);
         SignInGridPane.add(passwordFld, 1, 1);
         SignInGridPane.add(hbButtons, 0, 2, 2, 1);
+        SignInGridPane.add(errorMessageFld, 1, 3, 2, 1);
         signInScene = new Scene(SignInGridPane, 600, 600);
     }
+    
     // --------------------------------- main -------------------------------------------------------------
     public static void main(String[] args) {
         launch(args);
     }
 
+        // main window
+    public void initMainWindow(){        
+        BorderPane mainWindowPane = new BorderPane();
+        
+        //----------------------------top bar-------------------------------------------------------------------------------------//
+        Button signOut = new Button("Sign Out");
+        signOut.setPrefSize(170, 30);
+        
+        HBox topBar = new HBox();        
+        topBar.getChildren().addAll(signOut);
+        topBar.setAlignment(Pos.CENTER_RIGHT);
+        topBar.setStyle("-fx-background-color: #000000; -fx-padding: 20px;");
+        topBar.prefHeightProperty().bind(mainWindowPane.heightProperty().multiply(0.05));
+     
+        mainWindowPane.setTop(topBar);
+        
+        //----------------------------friends list--------------------------------------------------------------------------------//
+        //next block of code relating to arraylist will be replaced from db    
+        Map<String, Color> playersFromDB = new HashMap<>();
+        playersFromDB.put("Nada", Color.GRAY);
+        playersFromDB.put("Bahaa", Color.GREEN);
+        playersFromDB.put("AbdelRahman", Color.RED);
+        playersFromDB.put("Mostafa", Color.RED);
+        playersFromDB.put("David", Color.GREEN);
+        //end
+        
+        VBox friendsListPane = new VBox();
+        playersFromDB.entrySet().stream().forEach((player) -> {
+            Button invite = new Button("invite");
+            invite.setPrefSize(90, 30);
+            Button cancel = new Button("cancel");
+            cancel.setPrefSize(90, 30);
+            Text text = new Text(player.getKey());
+            text.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 20));
+            Circle playerStatus = new Circle(5, player.getValue());
+            
+            HBox hbox = new HBox(playerStatus, text,invite, cancel); 
+            
+            hbox.setSpacing(10);
+            hbox.setStyle("-fx-padding: 20px;");
+            friendsListPane.getChildren().add(hbox);
+            cancel.setDisable(true);
+            if(player.getValue() != Color.GREEN){
+                invite.setDisable(true);
+            }
+            invite.setOnAction((ActionEvent event) -> {
+                cancel.setDisable(false);
+                for(int i = 0; i< friendsListPane.getChildren().size(); i++){
+                    HBox temp = (HBox) friendsListPane.getChildren().get(i);
+                    temp.getChildren().get(2).setDisable(true);
+                }
+            });
+            cancel.setOnAction((ActionEvent event) -> {
+                invite.setDisable(false);
+                cancel.setDisable(true);
+                for(int i = 0; i< friendsListPane.getChildren().size(); i++){
+                    HBox temp = (HBox) friendsListPane.getChildren().get(i);
+                    Circle cirTemp = (Circle) temp.getChildren().get(0);
+                    if(cirTemp.getFill() == Color.GREEN){
+                        temp.getChildren().get(2).setDisable(false);
+                    }
+                }
+            });
+        });
+
+        ScrollPane friendlistPane = new ScrollPane(friendsListPane);
+        friendlistPane.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));        
+        
+        mainWindowPane.setLeft(friendlistPane);        
+        
+        //----------------------------Score-------------------------------------------------------------------------------------//
+        VBox scorePane = new VBox(10);
+        Text heading = new Text("Currents Score: ");
+        heading.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 40));
+        Text score = new Text("7");
+        score.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 40));
+        scorePane.getChildren().addAll(heading, score);
+        scorePane.setAlignment(Pos.CENTER);
+        
+        mainWindowPane.setRight(scorePane);
+        
+        //----------------------------Score-------------------------------------------------------------------------------------//
+        Button playWithMachine = new Button("Play With Machine");
+        playWithMachine.setAlignment(Pos.CENTER);
+        playWithMachine.setPrefSize(300, 300);
+        playWithMachine.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 40));
+        playWithMachine.setWrapText(true);
+        
+        mainWindowPane.setCenter(playWithMachine);
+        
+        ScrollPane mainWindowPaneScrolled = new ScrollPane(mainWindowPane);
+        mainWindowPaneScrolled.setFitToHeight(true);
+        mainWindowPaneScrolled.setFitToWidth(true);
+        Scene mainWindowScene = new Scene(mainWindowPaneScrolled);
+        currentScene = mainWindowScene;
+    }
+    
     
     //--------------------------------- Handling button clicks --------------------------------------------
     @Override
@@ -308,7 +429,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 ps.setScene(signInScene);
                 }
             else if(((Control)e.getSource()).getId()=="signInButton") {
-                 ps.setScene(signInScene);
+                signInWinInit();
+                ps.setScene(signInScene);
                   }
                  currentScene=signInScene;   
         }
@@ -391,7 +513,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             } 
            System.out.println(req.getRequestType());          
         }
-    }    
+    }
+
+   
     }
     
    
