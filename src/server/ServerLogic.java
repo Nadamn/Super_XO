@@ -17,11 +17,7 @@ import java.util.ArrayList;
 
 public class ServerLogic extends Thread{
     
-    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  ){
-        users = u;
-        status = s;
-        passwords = p;
-    }
+   
     
     public ServerSocket myserver ;
     boolean finish;
@@ -29,7 +25,10 @@ public class ServerLogic extends Thread{
     ArrayList<Integer> status ;
     ArrayList<String> passwords ;
     
-    public ServerLogic(){
+    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  ){
+        users = u;
+        status = s;
+        passwords = p;
         
         //launch(ar);
         try{
@@ -44,12 +43,11 @@ public class ServerLogic extends Thread{
            
     }
     
-    
     public void run(){
     
         try{
-            
-            myserver = new ServerSocket(7000);
+            System.out.println("hell1");
+            myserver = new ServerSocket(5001);
             while(!finish){
                 System.out.println("hell");
                 Socket s = myserver.accept();

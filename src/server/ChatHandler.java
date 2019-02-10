@@ -30,6 +30,7 @@ class ChatHandler extends Thread {
     static Vector<ChatHandler> clients = new Vector<ChatHandler>();
     Socket s;
     static boolean finish;
+    boolean found;
     public ChatHandler( Socket mys){
         
         try{
@@ -65,28 +66,50 @@ class ChatHandler extends Thread {
                     // check mess type by switch case 
                     // case "signin"
                     // 
-                    if( mess.getMsg().equals("signin") ){
+                    found = false;
+                    if( mess.getRequestType().equals("signInSubmit") ){
                         for (int i=0; i< Server.myServ.users.size(); i++) {
-                            if( Server.myServ.users.get(i).equals(mess.getMsg()[0])){
-                                if( Server.myServ.passwords.get(i).equals(mess.getMsg()[1])){
-                                        
+                            if( Server.myServ.users.get(i).equals(mess.getUserName())){
+                                found = true;
+                                if( Server.myServ.passwords.get(i).equals(mess.getPassWord())){       
                                     // return true 
+                                    Response r = new Response();
+                                    r.setReponseStatus(true);
+                                    r.setReponseType("signin");
+                                    r.setUsers(Server.myServ.users);
+                                    r.setStatus(Server.myServ.status);
+                                    this.ps.writeObject(r);
+                                    System.out.println("response sent");
+                                    
                                 }
                                 else{
                                     //return false worng password
+                                    Response r = new Response();
+                                    r.setReponseStatus(false);
+                                    r.setReponseType("signin");
+                                    r.setMessage("wrong password");
+                                    this.ps.writeObject(r);
+                                    System.out.println("response sent");
                                 }
                             }
-                            
+                            System.out.println("1");
                         }
                         
                         //return false user not found
-                        
+                        if(!found){
+                        Response r = new Response();
+                        r.setReponseStatus(false);
+                        r.setReponseType("signin");
+                        r.setMessage("user not exist");
+                        this.ps.writeObject(r);
+                        System.out.println("response sent");
+                        }
                     }
                     
                     
                    
                     
-                    sendToAll(mess);
+                    //sendToAll(mess);
                     //System.out.println("send been called");
             }
             catch(Exception e){

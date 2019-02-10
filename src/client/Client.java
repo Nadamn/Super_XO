@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -41,6 +42,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import server.Request;
+import server.Response;
 
 public class Client extends Application implements EventHandler<ActionEvent> {
     // variable for request object
@@ -70,13 +72,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     Socket mySocket;
     ObjectOutputStream printStream;
     ObjectInputStream dataInStream;
+    ArrayList<String> users ;
+    ArrayList<Integer> status ;
     
     public Boolean connectToServer(){
         Boolean success;
         finish = false;
         try {
             System.out.println("step0");
-            mySocket = new Socket("127.0.0.1", 7000);
+            mySocket = new Socket("127.0.0.1", 5001);
             System.out.println("step-1");
             printStream = new ObjectOutputStream(mySocket.getOutputStream());
             System.out.println("step--1");
@@ -94,12 +98,27 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 while (true){
                     try {
                         System.out.println("step2");
-                        Request r;
+                        Response r;
                         System.out.println("step3");
                         try {
-                            r = (Request) dataInStream.readObject();
-                            //System.out.println(r.getMsg()[0]+"\n");
-                            System.out.println("asds\n");
+                            r = (Response) dataInStream.readObject();
+                            
+                            if ( r.getReponseType().equals("signin")) { 
+                                
+                                    if( r.getReponseStatus()){
+                                        System.out.println("login success");
+                                        //r.getUsers()
+                                        //r.getStatus()         success             
+                                    }
+                                    else{
+                                        System.out.println("invalid user information");
+                                        System.out.println(r.getMessage());
+                                    }
+                            
+                            }
+                            
+                            
+                            System.out.println("response recieved\n");
                         } catch (ClassNotFoundException ex) {
                             
                             System.out.println("here1");
@@ -219,8 +238,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         if (e.getSource() == signInSubmitButton) {
             System.out.println("Submit");
             String [] fields = {userameTextFld.getText(), passwordFld.getText()};
-            //Request request = new Request("signin", fields , null, null);
+            
             //sending signIn request
+            
+            req = new Request();
             req.setRequestType("signInSubmit");
             req.setUserName(userameTextFld.getText());
             req.setPassWord(passwordFld.getText());
