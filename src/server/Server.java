@@ -143,6 +143,10 @@ public class Server extends Application {
         }    
     
     
+    
+    
+    
+    
     @Override
     public void start(Stage primaryStage) {
         for( int j=0 ; j < allPlayers.size() ;j++ ){
@@ -151,9 +155,6 @@ public class Server extends Application {
             passwords.add(allPlayers.get(j).getPassWord());
         }
         
-        
-        
-
         BorderPane border = new BorderPane();
         HBox hbox = addHBox();
         border.setTop(hbox);

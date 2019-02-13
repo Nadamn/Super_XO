@@ -88,6 +88,26 @@ public class DBManager {
     }
     
     
+    
+    public Player getPlayerByName(String name){
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM player WHERE username=?"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
+            ps.setString(1, name);
+            ResultSet rs= ps.executeQuery();
+            Player player = null;
+            while (rs.next()){
+                player = new Player(rs.getString(2), rs.getString(3));
+                player.setScore(rs.getInt(4));
+                player.setId(rs.getInt(1));
+            }
+            return player;
+        } catch (SQLException ex) {
+            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    
     public Vector<Game> getAllGames(){
         Vector<Game> games = new Vector<>();
         try {

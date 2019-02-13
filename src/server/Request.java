@@ -14,10 +14,16 @@ import java.io.Serializable;
 public class Request implements Serializable {
     
     private String requestType;
-    private String userName;
-    private String passWord;
+    private String userName;               // for the request sender
+    private String passWord;               // for the request sender
     private Integer currentPlay;
     private String chatMsg;
+    
+    private String destUserName;
+    
+    
+    public void setDistUserName(String userName){this.destUserName=userName;}
+    public String getDistUserName(){return this.destUserName;}
     
     
     public void setRequestType(String type){this.requestType=type;}

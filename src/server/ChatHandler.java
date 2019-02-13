@@ -24,7 +24,9 @@ import javafx.scene.shape.Circle;
     
 
 class ChatHandler extends Thread {
-
+    
+    
+    private DBManager DB;
     ObjectInputStream dis;
     ObjectOutputStream ps;
     static Vector<ChatHandler> clients = new Vector<ChatHandler>();
@@ -44,17 +46,14 @@ class ChatHandler extends Thread {
         }
         catch( Exception e){
             e.printStackTrace();
-           }
-        
-        
-        
+           }   
     }
     
     
     public void run(){
     
-        System.out.println("connection stablished");
-        while(!finish)
+       // System.out.println("connection stablished");
+        while(true)
         {
             try{
                     Request mess = (Request) dis.readObject();
@@ -63,9 +62,7 @@ class ChatHandler extends Thread {
                         throw new Exception("null");
                     }
                     
-                    // check mess type by switch case 
-                    // case "signin"
-                    // 
+                    
                     found = false;
                     if( mess.getRequestType().equals("signInSubmit") ){
                         for (int i=0; i< Server.myServ.users.size(); i++) {
@@ -106,11 +103,34 @@ class ChatHandler extends Thread {
                         }
                     }
                     
-                    
-                   
-                    
-                    //sendToAll(mess);
-                    //System.out.println("send been called");
+                    else if( mess.getRequestType().equals("signUpSubmit")){
+                        System.out.println("Sign UP request received");
+                        boolean userExisted=false;
+                        for (int i=0; i< Server.myServ.users.size(); i++)
+                        {
+                           if( Server.myServ.users.get(i).equals(mess.getUserName())){
+                           
+                            Response r = new Response();
+                            r.setReponseStatus(false);
+                            r.setReponseType("signup");
+                            r.setMessage("SignUpFailed");
+                            this.ps.writeObject(r);
+                            userExisted=true;
+                            break;
+                           
+                           }
+                        }
+                        if (!userExisted){
+                            System.out.println("Not existed");
+                            Response r = new Response();
+                            r.setReponseStatus(true);
+                            r.setReponseType("signup");
+                            r.setMessage("SignUp Sucessfully");
+                            r.setUsers(Server.myServ.users);
+                            r.setStatus(Server.myServ.status);
+                            this.ps.writeObject(r);  
+                        }                    
+                    }
             }
             catch(Exception e){
                 
