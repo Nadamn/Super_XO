@@ -498,9 +498,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     public void wrongCredentialsAlertInit(String message){
     
        BorderPane rootPane=new BorderPane();
-       Text alertMsg=new Text("message");
+       Text alertMsg=new Text(message);
        
-       Button back=new Button("Back to login");
+       Button back=new Button("Back");
        back.setOnAction(this);
        back.setId("backToLogin");  
        rootPane.setTop(alertMsg);
