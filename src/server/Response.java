@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -16,12 +17,19 @@ public class Response implements Serializable {
     
     private String reponseType;
     private String message;
-    private boolean invitationReplyValue;  // false for decline and true for accept and will be checked only for response type "InvitationStatus"
     private boolean reponseStatus;
+    private boolean invitationReplyValue;  // false for decline and true for accept and will be checked only for response type "InvitationStatus"
     private String userName;
     private ArrayList<String> users  ;
     private ArrayList<Integer> status ;
+    private String [] currentPlayerData;
     
+    public String getMessage(){
+        return this.message;
+    }
+    public void setMessage( String m){
+        this.message = m;
+    }
     
     
     public boolean getInvitationReply(){
@@ -32,12 +40,11 @@ public class Response implements Serializable {
         this.invitationReplyValue=x;
     }
     
-    
-    public String getMessage(){
-        return this.message;
+    public String [] getCurrentPlayerData(){
+        return this.currentPlayerData;
     }
-    public void setMessage( String m){
-        this.message = m;
+    public void setCurrentPlayerData( String [] currentPlayerData){
+        this.currentPlayerData = currentPlayerData;
     }
     
     public String getReponseType() {
