@@ -25,10 +25,13 @@ public class ServerLogic extends Thread{
     ArrayList<Integer> status ;
     ArrayList<String> passwords ;
     
-    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  ){
+    DBManager db;
+    
+    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  ,DBManager db){
         users = u;
         status = s;
         passwords = p;
+        this.db=db;
         
         //launch(ar);
         try{
@@ -51,7 +54,7 @@ public class ServerLogic extends Thread{
             while(!finish){
                 System.out.println("hell");
                 Socket s = myserver.accept();
-                new ChatHandler(s);
+                new ChatHandler(s,db);
             }
         }
         catch( Exception e)

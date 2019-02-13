@@ -57,10 +57,10 @@ public class DBManager {
     
     public Boolean createNewPlayer(Player player){
         try {
-            PreparedStatement ps = con.prepareStatement("INSERT INTO player(username, password, score) VALUES (?,?,?)"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
+            PreparedStatement ps = con.prepareStatement("INSERT INTO player(username, password, score) VALUES (?,?,0)"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
             ps.setString(1, player.getUsername());
             ps.setString(2, player.getPassWord());
-            ps.setInt(3, player.getScore());
+            //ps.setInt(3, player.getScore());
             int rs= ps.executeUpdate();
             return true;
         } catch (SQLException ex) {

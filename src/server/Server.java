@@ -39,7 +39,7 @@ import javafx.stage.WindowEvent;
 public class Server extends Application {
    
     //players from db
-    private DBManager db = new DBManager();
+    public DBManager db = new DBManager();
     private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
    
     static String[] ar;
@@ -167,7 +167,7 @@ public class Server extends Application {
         primaryStage.setTitle("X_O Server");
         primaryStage.setScene(scene);
         primaryStage.show();
-        myServ = new ServerLogic( users , status , passwords);
+        myServ = new ServerLogic( users , status , passwords,db);
         
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
             public void handle( WindowEvent close){
