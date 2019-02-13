@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -21,7 +22,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -151,7 +154,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     }
 
     public void handleResponse(Response r) {
-        if (r.getReponseType().equals("signin")) {
+        if (r.getReponseType().equals("signin") || r.getReponseType().equals("statuses update") ) {
             System.out.println("Login request received");
             if (r.getReponseStatus()) {
                 System.out.println("login success");
@@ -165,6 +168,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                             allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
                             System.out.println(usernames.get(i));
                         }
+                        Request req = new Request();
+                        req.setRequestType("set username");
+                        req.setUserName(currentPlayersData[0]);
                         initMainWindow();
                         currentScene = mainWindowScene;
                         ps.setScene(currentScene);
@@ -214,6 +220,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
             }
 
+        } else if (r.getReponseType().equals("invitation request")) {
+            Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        invitationDialog(r);
+                    }
+                });
         }
     }
 
@@ -303,6 +316,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     HBox temp = (HBox) friendsListPane.getChildren().get(i);
                     temp.getChildren().get(2).setDisable(true);
                 }
+                req = new Request();
+                req.setDistUserName(player.getKey());
+                req.setRequestType("invite");
+                req.setUserName(currentPlayersData[0]);
+                try {
+                    printStream.writeObject(req);
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
             cancel.setOnAction((ActionEvent event) -> {
                 invite.setDisable(false);
@@ -313,6 +335,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     if (cirTemp.getFill() == Color.GREEN) {
                         temp.getChildren().get(2).setDisable(false);
                     }
+                }
+                req = new Request();
+                req.setDistUserName(player.getKey());
+                req.setRequestType("cancel Invitation");
+                req.setUserName(currentPlayersData[0]);
+                try {
+                    printStream.writeObject(req);
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
         });
@@ -492,6 +523,41 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         rootPane.setTop(alertMsg);
         rootPane.setCenter(back);
         alertScene = new Scene(rootPane, 400, 300);
+    }
+    
+    //invitation window
+    public void invitationDialog(Response r){
+        Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
+        inviteConfirm.setTitle("Invitation Message");
+        inviteConfirm.setHeaderText(r.getUserName()+" invited you to play with him");
+        inviteConfirm.setContentText("Do you want to play with him?");
+        
+        ButtonType yesButton = new ButtonType("yes");
+        ButtonType noButton = new ButtonType("nahh");
+        
+        inviteConfirm.getButtonTypes().setAll(yesButton, noButton);
+        Optional<ButtonType> result = inviteConfirm.showAndWait();
+        
+        Response res = new Response();
+        res.setReponseType("invitation response");
+        res.setInvitationReply(false);
+        res.setUserName(currentPlayersData[0]);
+        res.setDestUsername(r.getUserName());
+        
+        if (result.get() == yesButton){
+            res.setInvitationReply(true);
+            gameWinInit();
+            currentScene = gameScene;
+            ps.setScene(currentScene);
+            ps.show();
+        } else {
+            res.setInvitationReply(false);            
+        }
+        try {
+            printStream.writeObject(res);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // --------------------------------- main -------------------------------------------------------------

@@ -66,9 +66,7 @@ public class Server extends Application {
                 return red;
         }
         return gray;
-    }   
-    
-    
+    }
     
     public HBox addHBox() {
             HBox hbox = new HBox();

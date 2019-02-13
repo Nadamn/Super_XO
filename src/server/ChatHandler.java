@@ -33,6 +33,10 @@ class ChatHandler extends Thread {
     Socket s;
     static boolean finish;
     boolean found;
+    private String username;
+    
+    
+    
     public ChatHandler( Socket mys,DBManager DB){
         
         try{
@@ -96,6 +100,7 @@ class ChatHandler extends Thread {
     
     public void handleRequest(Request mess) throws IOException{
         Response r = new Response();
+        Request req = new Request();
         switch (mess.getRequestType()){
             
             case "signInSubmit":
@@ -180,6 +185,24 @@ class ChatHandler extends Thread {
             }
                 
                 break;
+            case "invite":
+            { 
+                System.out.println("invite request is recieved");
+                for(ChatHandler ch: clients){
+                    if (ch.getUserName().equals(mess.getDistUserName())){
+                        req.setUserName(r.getUserName());
+                        req.setDistUserName(r.getDestUsername());
+                        req.setRequestType("invitation request"); 
+                        ch.ps.writeObject(req);
+                    }
+                }
+            }
+                break;
+            case "set username":
+            { 
+                System.out.println("invite request is recieved");
+                this.username = r.getUserName();
+            }
         }
     
     
@@ -188,6 +211,10 @@ class ChatHandler extends Thread {
     
     
     
+    }
+    
+    public String getUserName(){
+        return this.username;
     }
     
     
