@@ -105,14 +105,17 @@ class ChatHandler extends Thread {
                                 found = true;
                                 if( Server.myServ.passwords.get(i).equals(mess.getPassWord())){       
                                     // return true 
-                                    
+                                    Player currentPlayer = DB.getPlayer(mess.getUserName());
+                                    String [] playerData = {currentPlayer.getUsername(), currentPlayer.getScore().toString()};
                                     r.setReponseStatus(true);
                                     r.setReponseType("signin");
                                     r.setUsers(Server.myServ.users);
                                     r.setStatus(Server.myServ.status);
+                                    r.setCurrentPlayerData(playerData);
                                     //this.ps.writeObject(r);
                                     Server.updateStatus(mess.getUserName(),1);
                                     System.out.println("response sent");
+                                    System.out.println(DB.getPlayer(mess.getUserName()).getScore());
                                     
                                 }
                                 else{

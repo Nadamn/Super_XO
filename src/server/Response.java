@@ -20,12 +20,20 @@ public class Response implements Serializable {
     private String userName;
     private ArrayList<String> users  ;
     private ArrayList<Integer> status ;
+    private String [] currentPlayerData;
     
     public String getMessage(){
         return this.message;
     }
     public void setMessage( String m){
         this.message = m;
+    }
+    
+    public String [] getCurrentPlayerData(){
+        return this.currentPlayerData;
+    }
+    public void setCurrentPlayerData( String [] currentPlayerData){
+        this.currentPlayerData = currentPlayerData;
     }
     
     public String getReponseType() {

@@ -41,7 +41,7 @@ public class Server extends Application {
     //players from db
     public DBManager db = new DBManager();
     private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
-   
+    
     static String[] ar;
     static Color red = Color.RED;
     static Color green = Color.CHARTREUSE;
@@ -56,7 +56,7 @@ public class Server extends Application {
     //int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
     static ServerLogic myServ ;
     
-    private static Color state(int s){
+    public static Color state(int s){
         switch (s){
             case 0 :
                 return gray;

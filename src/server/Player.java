@@ -13,7 +13,7 @@ public class Player {
     private int id;
     private String username;
     private String password;
-    private int score =0;
+    private Integer score =0;
     private int status;
     
 
@@ -38,11 +38,11 @@ public class Player {
         return this.password;
     }
     
-    public int getScore(){
+    public Integer getScore(){
         return this.score;
     }
     
-    public void setScore(int score){
+    public void setScore(Integer score){
         this.score= score;
     }
     
