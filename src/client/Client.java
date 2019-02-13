@@ -68,6 +68,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     Stage ps;
     //------------------------------ Thread --------------------------------------------------------------------------
      //Thread clientListner;
+   
+    //------------------------------ Colors --------------------------------------------------------------------------    
+    static Color red = Color.RED;
+    static Color green = Color.CHARTREUSE;
+    static Color gray = Color.LIGHTGREY;
     //------------------------------ TextFields and other variables---------------------------------------------------
     TextField userameTextFld;
     PasswordField passwordFld;
@@ -144,6 +149,18 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         backgroundThread.start();  
         return true;
     }
+    
+      private static Color state(int s){
+        switch (s){
+            case 0 :
+                return gray;
+            case 1 :
+                return green;
+            case 2 :
+                return red;
+        }
+        return gray;
+    }   
     
     public void handleResponse(Response r){
         if ( r.getReponseType().equals("signin")) { 
@@ -280,6 +297,12 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         //----------------------------friends list--------------------------------------------------------------------------------//
         //next block of code relating to arraylist will be replaced from db    
         Map<String, Color> playersFromDB = new HashMap<>();
+        /*
+        for (int i=0; i< users.size(); i++) {
+                playersFromDB.put( users.get(i), state(status.get(i)));
+        }
+*/
+        
         playersFromDB.put("Nada", Color.GRAY);
         playersFromDB.put("Bahaa", Color.GREEN);
         playersFromDB.put("AbdelRahman", Color.RED);

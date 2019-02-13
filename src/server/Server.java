@@ -43,19 +43,20 @@ public class Server extends Application {
     private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
    
     static String[] ar;
-    Color red = Color.RED;
-    Color green = Color.CHARTREUSE;
-    Color gray = Color.LIGHTGREY;
-    ArrayList<String> users = new ArrayList();
-    ArrayList<Integer> status = new ArrayList();
+    static Color red = Color.RED;
+    static Color green = Color.CHARTREUSE;
+    static Color gray = Color.LIGHTGREY;
+    static ArrayList<String> users = new ArrayList();
+    static ArrayList<Integer> status = new ArrayList();
     ArrayList<String> passwords = new ArrayList();
+    static ArrayList<Circle> options;
     
     
     //String users[] =  new String[]{ "Abdelrahman" , "Bahaa" , "David" , "Mostafa" , "Nada"};
     //int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
     static ServerLogic myServ ;
     
-    private Color state(int s){
+    private static Color state(int s){
         switch (s){
             case 0 :
                 return gray;
@@ -129,7 +130,7 @@ public class Server extends Application {
             title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
             vbox.getChildren().add(title);
             
-            ArrayList<Circle> options = new ArrayList();
+            options = new ArrayList();
             for (int i=0; i< users.size(); i++) {
                 options.add(new Circle(6,state(status.get(i))));
             }
@@ -143,7 +144,21 @@ public class Server extends Application {
         }    
     
     
-    
+    public static void updateStatus(String name,int st){
+        
+        for (int i = 0; i < users.size(); i++)
+        {
+            String iterator = users.get(i);
+            if (iterator.equals(name))
+            {
+                options.get(i).setFill(state(st));
+                status.set(i,st);
+                break;
+            }
+        } 
+
+
+    }
     
     
     

@@ -111,6 +111,7 @@ class ChatHandler extends Thread {
                                     r.setUsers(Server.myServ.users);
                                     r.setStatus(Server.myServ.status);
                                     //this.ps.writeObject(r);
+                                    Server.updateStatus(mess.getUserName(),1);
                                     System.out.println("response sent");
                                     
                                 }
