@@ -18,9 +18,12 @@ public class Request implements Serializable {
     private String passWord;               // for the request sender
     private Integer currentPlay;
     private String chatMsg;
-    
+    private boolean Reply;
     private String destUserName;
     
+    
+    public void setInvitationReply(boolean rep){ this.Reply = rep;}
+    public boolean getInvitationReply(){ return this.Reply ;}
     
     public void setDistUserName(String userName){this.destUserName=userName;}
     public String getDistUserName(){return this.destUserName;}

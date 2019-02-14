@@ -538,11 +538,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         inviteConfirm.getButtonTypes().setAll(yesButton, noButton);
         Optional<ButtonType> result = inviteConfirm.showAndWait();
         
-        Response res = new Response();
-        res.setReponseType("invitation response");
+        Request res = new Request();
+        res.setRequestType("invitation response");
         res.setInvitationReply(false);
         res.setUserName(currentPlayersData[0]);
-        res.setDestUsername(r.getUserName());
+        res.setDistUserName(r.getUserName());
         
         if (result.get() == yesButton){
             res.setInvitationReply(true);

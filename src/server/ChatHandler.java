@@ -33,7 +33,7 @@ class ChatHandler extends Thread {
     Socket s;
     static boolean finish;
     boolean found;
-    private String username;
+    private static String username;
     
     
     
@@ -74,6 +74,7 @@ class ChatHandler extends Thread {
                     System.out.println("client logout");
                     ps.close();
                     dis.close();
+                    Server.updateStatus(username,0);
                     clients.remove(this);
                     s.close();
                     //sendToAll("client removed");
@@ -188,12 +189,34 @@ class ChatHandler extends Thread {
             case "invite":
             { 
                 System.out.println("invite request is recieved");
-                for(ChatHandler ch: clients){
-                    if (ch.getUserName().equals(mess.getDistUserName())){
-                        req.setUserName(r.getUserName());
-                        req.setDistUserName(r.getDestUsername());
+                for(ChatHandler ch: clients)
+                {
+                    if (ch.getUserName().equals(mess.getDistUserName()))
+                    {
+                        req.setUserName(mess.getUserName());
+                        req.setDistUserName(mess.getDistUserName());
                         req.setRequestType("invitation request"); 
                         ch.ps.writeObject(req);
+                        System.out.println("invitaion sent to client 2");
+                        break;
+                    }
+                }
+            }
+                break;
+            case "invitation response":
+            { 
+                System.out.println("invite response is recieved");
+                for(ChatHandler ch: clients)
+                {
+                    if (ch.getUserName().equals(mess.getDistUserName()))
+                    {
+                        r.setUserName(mess.getUserName());
+                        r.setDestUsername(mess.getDistUserName());
+                        r.setReponseType("invitation response"); 
+                        r.setInvitationReply(mess.getInvitationReply());
+                        ch.ps.writeObject(r);
+                        System.out.println("invitaion sent to client 1");
+                        break;
                     }
                 }
             }
@@ -224,6 +247,7 @@ class ChatHandler extends Thread {
                     ch.finish = true;
                     ch.ps.close();
                     ch.dis.close();
+                    Server.updateStatus(username,0);
                     clients.remove(ch);
                     ch.s.close();
                     break;
