@@ -188,23 +188,23 @@ public class DBManager {
 ////        }
 ////    }
     
-    public Boolean updateGameScore(Game game, Integer [] score){
-        try {
-            PreparedStatement ps = con.prepareStatement("UPDATE game SET gamestate=? WHERE player1id=? AND player2id=?"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
-            String gameBoardString= "";
-            for (Integer element: score){
-                gameBoardString += element.toString();
-            }
-            ps.setString(1, gameBoardString);
-            ps.setInt(2, game.getPlayer1().getId());
-            ps.setInt(3, game.getPlayer2().getId());
-            int rs= ps.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
+//    public Boolean updateGameScore(Game game, Integer [] score){
+//        try {
+//            PreparedStatement ps = con.prepareStatement("UPDATE game SET gamestate=? WHERE player1id=? AND player2id=?"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
+//            String gameBoardString= "";
+//            for (Integer element: score){
+//                gameBoardString += element.toString();
+//            }
+//            ps.setString(1, gameBoardString);
+//            ps.setInt(2, game.getPlayer1().getId());
+//            ps.setInt(3, game.getPlayer2().getId());
+//            int rs= ps.executeUpdate();
+//            return true;
+//        } catch (SQLException ex) {
+//            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
+//            return false;
+//        }
+//    }
     
     public static void main(String[] args) {
         DBManager db = new DBManager();    

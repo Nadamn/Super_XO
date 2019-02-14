@@ -127,8 +127,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         Response r;
                         try {
                             r = (Response) dataInStream.readObject();
+                            
                             handleResponse(r);
-                            System.out.println("response recieved\n");
+                            //System.out.println("response recieved\n");
                         } catch (ClassNotFoundException ex) {
 
                             System.out.println("here1");
@@ -161,6 +162,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     }
 
     public void handleResponse(Response r) {
+        
+        
+        System.out.println(r.getReponseType());
+        
         if (r.getReponseType().equals("signin") || r.getReponseType().equals("statuses update") ) {
             System.out.println("Login request received");
             if (r.getReponseStatus()) {
@@ -213,7 +218,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         ps.show();
                     }
                 });
-            } else {
+            } else  {
 
                 Platform.runLater(new Runnable() {
                     @Override
@@ -228,13 +233,38 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             }
 
         } else if (r.getReponseType().equals("invitation request")) {
+            System.out.println("Iam "+ currentPlayersData[0]+ " I got "+r.getReponseType()+"From "+r.getUserName());
             Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        invitationDialog(r);
+                        invitationDialog(r);    
                     }
                 });
+        } else if(r.getReponseType().equals("invitation response")){
+            System.out.println("Iam "+ currentPlayersData[0]+ " I got "+r.getReponseType()+"From "+r.getUserName());
+            
+            
+            
+            Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(r.getInvitationReply()){
+                   gameWinInit(newGameInitArr);
+                    currentScene = gameScene;
+                    ps.setScene(currentScene);
+                    ps.show();
+                   
+               
+               }   
+                    }
+                });
+        
+               
+        
+        
         }
+        
+        
     }
 
 //    //--------------------------------- Start ---------------------------------------------------
@@ -568,7 +598,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         if (result.get() == yesButton){
             res.setInvitationReply(true);
             gameWinInit(newGameInitArr);
+            
+            System.out.println("Hello I accepted the invitaion!!!");
             currentScene = gameScene;
+            /////////// Add line to prevent player 2 from playing any button
             ps.setScene(currentScene);
             ps.show();
         } else {

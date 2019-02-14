@@ -21,11 +21,7 @@ import javafx.scene.shape.Circle;
  * @author abahaa
  */
 
-    
-
-class ChatHandler extends Thread {
-    
-    
+class ChatHandler extends Thread {    
     private DBManager DB;
     ObjectInputStream dis;
     ObjectOutputStream ps;
@@ -34,7 +30,8 @@ class ChatHandler extends Thread {
     static boolean finish;
     boolean found;
     private  String username;
-    
+    private Game g;
+    private Integer[][] quickGameInitArr={{2,2,2},{2,2,2},{2,2,2}};
     
     
     public ChatHandler( Socket mys,DBManager DB){
@@ -61,12 +58,21 @@ class ChatHandler extends Thread {
         while(true)
         {
             try{
-                    Request mess = (Request) dis.readObject();
+                    Request mess =  (Request) dis.readObject();
                   if( mess == null )
                     {
                         throw new Exception("null");
                     }
+                  
+//                  System.out.println("TEst Test");
+//                  System.out.println(mess.getRequestType());
+//                  System.out.println(mess.getUserName());
+//                  System.out.println(mess.getDistUserName());
+//                  System.out.println("Test End");
                     handleRequest(mess);
+                    
+                    
+                    
             }
             catch(Exception e){
                 
@@ -101,8 +107,12 @@ class ChatHandler extends Thread {
     
     public void handleRequest(Request mess) throws IOException{
         Response r = new Response();
-        Request req = new Request();
+        //Request req = new Request();
+        
+        
         switch (mess.getRequestType()){
+            
+           
             
             case "signInSubmit":
             {       found = false;
@@ -121,8 +131,8 @@ class ChatHandler extends Thread {
                                     r.setCurrentPlayerData(playerData);
                                     //this.ps.writeObject(r);
                                     Server.updateStatus(mess.getUserName(),1);
-                                    System.out.println("response sent");
-                                    System.out.println(DB.getPlayer(mess.getUserName()).getScore());
+//                                    System.out.println("response sent");
+//                                    System.out.println(DB.getPlayer(mess.getUserName()).getScore());
                                     
                                 }
                                 else{
@@ -132,10 +142,10 @@ class ChatHandler extends Thread {
                                     r.setReponseType("signin");
                                     r.setMessage("wrong password");
                                     //this.ps.writeObject(r);
-                                    System.out.println("response sent");
+                                    //System.out.println("response sent");
                                 }
                             }
-                            System.out.println("1");
+                           // System.out.println("1");
                         }
                         
                         //return false user not found
@@ -145,14 +155,14 @@ class ChatHandler extends Thread {
                         r.setReponseType("signin");
                         r.setMessage("user not exist");
                         //this.ps.writeObject(r);
-                        System.out.println("response sent");
+                       // System.out.println("response sent");
                         }
             }
                 break;
                 
             case "signUpSubmit":
             {
-                        System.out.println("Sign UP request received");
+                        //System.out.println("Sign UP request received");
                         boolean userExisted=false;
                         for (int i=0; i< Server.myServ.users.size(); i++)
                         {
@@ -177,10 +187,10 @@ class ChatHandler extends Thread {
                             this.setUserName(mess.getUserName());
                             Player p=new Player(mess.getUserName(),mess.getPassWord());
                             boolean s=DB.createNewPlayer(p);
-                            if (s)
-                            System.out.println("Adding to data base successfully");
-                            else
-                                System.out.println("Not added check again");
+//                            if (s)
+//                            System.out.println("Adding to data base successfully");
+//                            else
+//                                System.out.println("Not added check again");
                                 
                             //this.ps.writeObject
                         } 
@@ -189,17 +199,27 @@ class ChatHandler extends Thread {
                 break;
             case "invite":
             { 
-                System.out.println("invite request is recieved");
+//                System.out.println("invite request is recieved");
+//                System.out.println("I am "+mess.getUserName()+" and looking for "+ mess.getDistUserName());
+//                System.out.println("WWWWWWWWW");
+                
+                System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
+        
+                
+                
                 for(ChatHandler ch: clients)
                 {   
                     if (ch.getUserName().equals(mess.getDistUserName()))
-                    {   System.out.println("1sa");
-                        System.out.println("we found");
+                    {  // System.out.println("1sa");
+//                        System.out.println("we found");
+//                        System.out.println("FFFFFFFFFFFFF");
+//                        System.out.println(mess.getUserName());
+//                        System.out.println(mess.getDistUserName());
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation request"); 
-                        ch.ps.writeObject(req);
-                        System.out.println("invitaion sent to client 2");
+                        ch.ps.writeObject(r);
+                       // System.out.println("invitaion sent to client 2");
                         break;
                     }
                 }
@@ -207,17 +227,25 @@ class ChatHandler extends Thread {
                 break;
             case "invitation response":
             { 
-                System.out.println("invite response is recieved");
+                //System.out.println("invite response is recieved");
                 for(ChatHandler ch: clients)
                 {
                     if (ch.getUserName().equals(mess.getDistUserName()))
                     {
+                        System.out.println(mess.getUserName());
+                        System.out.println(mess.getUserName());
+                        System.out.println(mess.getUserName());
+                        
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation response"); 
                         r.setInvitationReply(mess.getInvitationReply());
+                        System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
                         ch.ps.writeObject(r);
-                        System.out.println("invitaion sent to client 1");
+                        // Cheking if player 2 accepted the invitation or not 
+                         if (r.getInvitationReply())   //if yes we need to instantiate game object
+                             g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
+                       // System.out.println("invitaion sent to client 1");
                         break;
                     }
                 }
@@ -229,23 +257,23 @@ class ChatHandler extends Thread {
                 this.username = r.getUserName();
             }
         }
-    
-    
-    
-    this.ps.writeObject(r);
-    
-    
-    
+        
+     if (mess.getRequestType().equals("signInSubmit") || mess.getRequestType().equals("signUpSubmit") || mess.getRequestType().equals("set username")) 
+     {
+         System.out.println("I am server sending "+ r.getReponseType() +  "to "+r.getDestUsername());
+     this.ps.writeObject(r);
+     
+     }
+           
     }
-    
+
     public String getUserName(){
         return this.username;
     }
     public void  setUserName(String s){
          this.username = s;
     }
-    
-    
+ 
     public static void close(){
         for( ChatHandler ch : clients){
             try {
@@ -262,8 +290,6 @@ class ChatHandler extends Thread {
         } 
         System.out.println("all users removed");
     }
-    
-    
 }
 
 

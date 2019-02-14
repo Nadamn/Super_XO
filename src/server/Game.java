@@ -11,8 +11,8 @@ package server;
  */
 
 public class Game {
-    private Player p1;  //x    we may need to change this to be player1 name of type string only 
-    private Player p2;  //o
+    private String p1Name;  //x    we may need to change this to be player1 name of type string only 
+    private String p2Name;  //o
     private Integer[][] gameBoard;
     private Integer lastMovePlayer=0;// This will track which player played last move
                                      // (odd numbers for player 1(x)  and even numbers for player2(o))
@@ -33,27 +33,27 @@ public class Game {
 //       4- check for winner using checkWinner after every move
 //       5- if there are winners or tie game update gamestate attribute so the external handler can make the corresponding response  
 //    
-    public Game(Player p1,Player p2, Integer[][]gameBoard){
-        this.p1=p1;
-        this.p2=p2;
+    public Game(String p1Name,String p2Name, Integer[][]gameBoard){    // Player 1 X  player 2 O
+        this.p1Name=p1Name;
+        this.p2Name=p2Name;
         this.gameBoard=gameBoard;
     }
     
-    public void setPlayer1(Player p1){
-        this.p1 = p1;
-    }
+//    public void setPlayer1(Player p1){
+//        this.p1 = p1;
+//    }
     
-    public Player getPlayer1(){
-        return this.p1;
-    }
+//    public Player getPlayer1(){
+//        return this.p1;
+//    }
     
-    public void setPlayer2(Player p2){
-        this.p2 = p2;
-    }
+//    public void setPlayer2(Player p2){
+//        this.p2 = p2;
+//    }
     
-    public Player getPlayer2(){
-        return this.p2;
-    }
+//    public Player getPlayer2(){
+//        return this.p2;
+//    }
     
     public void setGameBoard(Integer [][] gameBoard){
         this.gameBoard = gameBoard;
