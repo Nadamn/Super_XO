@@ -60,13 +60,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
     //-------------------------------- Request Object ---------------------------------------------------------------
     Request req = new Request();
-    
-    //-------------------------------- Game Variables ---------------------------------------------------------------
-    Integer currentMove=0;    // from 1 to 9 
-    boolean isPlayerTypeX; // true for player x false for player y
-    String otherPlayerName; //we may not use this (check later)
-    Integer[][] quickGameInitArr= {{2,2,2},{2,2,2},{2,2,2}};
-    
     //-------------------------------- Scenes -----------------------------------------------------------------------
     Scene landingWindowScene;
     Scene signInScene;
@@ -79,6 +72,14 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //------------------------------ Thread --------------------------------------------------------------------------
     //Thread clientListner;
 
+    //-------------------------------- Game variables ---------------------------------------------------------------
+    Integer currentMove=0;    // from 1 to 9 
+    boolean isPlayerTypeX; // true for player x false for player y
+    String otherPlayerName; //we may not use this (check later)
+    Integer [][] newGameInitArr = {{2,2,2},{2,2,2},{2,2,2}};
+    
+    
+    
     //------------------------------ Colors --------------------------------------------------------------------------    
     static Color red = Color.RED;
     static Color green = Color.CHARTREUSE;
@@ -247,9 +248,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         }
         landingWinInit();
         signInWinInit();
-        
-        gameWinInit(quickGameInitArr);
-        
+        gameWinInit(newGameInitArr);
 
         primaryStage.setTitle("TicTacToe");
         currentScene = landingWindowScene;
@@ -416,7 +415,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     }
 
     // Game win init
-        // Game win init
+    // Game win init
     public void gameWinInit(Integer[][] x) {
         BorderPane borderPane;
         GridPane gamePane;
@@ -446,6 +445,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         btnsPane.setVgap(50);
         borderPane.setLeft(btnsPane);
         borderPane.setCenter(gamePane);
+        
+        
         for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
                 Buttons[i][j] = new Button();
@@ -566,7 +567,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         
         if (result.get() == yesButton){
             res.setInvitationReply(true);
-            gameWinInit(quickGameInitArr);
+            gameWinInit(newGameInitArr);
             currentScene = gameScene;
             ps.setScene(currentScene);
             ps.show();
