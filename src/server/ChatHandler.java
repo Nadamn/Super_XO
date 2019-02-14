@@ -33,7 +33,7 @@ class ChatHandler extends Thread {
     Socket s;
     static boolean finish;
     boolean found;
-    private static String username;
+    private  String username;
     
     
     
@@ -116,6 +116,7 @@ class ChatHandler extends Thread {
                                     r.setReponseStatus(true);
                                     r.setReponseType("signin");
                                     r.setUsers(Server.myServ.users);
+                                    this.setUserName(mess.getUserName());
                                     r.setStatus(Server.myServ.status);
                                     r.setCurrentPlayerData(playerData);
                                     //this.ps.writeObject(r);
@@ -173,7 +174,7 @@ class ChatHandler extends Thread {
                             r.setMessage("SignUp Sucessfully");
                             r.setUsers(Server.myServ.users);
                             r.setStatus(Server.myServ.status);
-                            
+                            this.setUserName(mess.getUserName());
                             Player p=new Player(mess.getUserName(),mess.getPassWord());
                             boolean s=DB.createNewPlayer(p);
                             if (s)
@@ -190,12 +191,13 @@ class ChatHandler extends Thread {
             { 
                 System.out.println("invite request is recieved");
                 for(ChatHandler ch: clients)
-                {
+                {   
                     if (ch.getUserName().equals(mess.getDistUserName()))
-                    {
-                        req.setUserName(mess.getUserName());
-                        req.setDistUserName(mess.getDistUserName());
-                        req.setRequestType("invitation request"); 
+                    {   System.out.println("1sa");
+                        System.out.println("we found");
+                        r.setUserName(mess.getUserName());
+                        r.setDestUsername(mess.getDistUserName());
+                        r.setReponseType("invitation request"); 
                         ch.ps.writeObject(req);
                         System.out.println("invitaion sent to client 2");
                         break;
@@ -239,6 +241,9 @@ class ChatHandler extends Thread {
     public String getUserName(){
         return this.username;
     }
+    public void  setUserName(String s){
+         this.username = s;
+    }
     
     
     public static void close(){
@@ -247,7 +252,7 @@ class ChatHandler extends Thread {
                     ch.finish = true;
                     ch.ps.close();
                     ch.dis.close();
-                    Server.updateStatus(username,0);
+                    Server.updateStatus(ch.getUserName(),0);
                     clients.remove(ch);
                     ch.s.close();
                     break;
