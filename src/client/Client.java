@@ -60,6 +60,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
     //-------------------------------- Request Object ---------------------------------------------------------------
     Request req = new Request();
+    
+    //-------------------------------- Game Variables ---------------------------------------------------------------
+    Integer currentMove=0;    // from 1 to 9 
+    boolean isPlayerTypeX; // true for player x false for player y
+    String otherPlayerName; //we may not use this (check later)
+    Integer[][] quickGameInitArr= {{2,2,2},{2,2,2},{2,2,2}};
+    
     //-------------------------------- Scenes -----------------------------------------------------------------------
     Scene landingWindowScene;
     Scene signInScene;
@@ -79,7 +86,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //------------------------------ TextFields and other variables---------------------------------------------------
     TextField userameTextFld;
     PasswordField passwordFld;
-    int currentMove = 0;
     boolean finish;
     boolean isSignIn = true;   // Flag to make difference between sign in and sign up scenes 
     //---------------------------------variables for landing and signin windows---------------------------------------
@@ -241,7 +247,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         }
         landingWinInit();
         signInWinInit();
-        gameWinInit();
+        
+        gameWinInit(quickGameInitArr);
+        
 
         primaryStage.setTitle("TicTacToe");
         currentScene = landingWindowScene;
@@ -408,14 +416,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     }
 
     // Game win init
-    public void gameWinInit() {
+        // Game win init
+    public void gameWinInit(Integer[][] x) {
         BorderPane borderPane;
         GridPane gamePane;
         FlowPane btnsPane;
         Button signOut;
         Button quitGame;
         Button newGame;
-        Button[] Buttons = new Button[9];
+        Button[][] Buttons = new Button[3][3];
         newGame = new Button("New Game");
         newGame.setOnAction((EventHandler<ActionEvent>) this);
         newGame.setId("newGame");
@@ -437,27 +446,38 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         btnsPane.setVgap(50);
         borderPane.setLeft(btnsPane);
         borderPane.setCenter(gamePane);
-        for (int i = 0; i < 9; i++) {
-            Buttons[i] = new Button();
-            Buttons[i].setMinSize(100, 100);
-            Buttons[i].setStyle("-fx-background-color:lightblue");
-            Buttons[i].setOnAction(this);
-            Buttons[i].setId("gameButton" + (i + 1));
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                Buttons[i][j] = new Button();
+                Buttons[i][j].setMinSize(100, 100);
+                Buttons[i][j].setStyle("-fx-background-color:lightblue");
+                Buttons[i][j].setOnAction(this);
+                Buttons[i][j].setId("gameButton" + (i*3+j+1));
+                //Buttons[i][j].setText(Integer.toString(i*3+j+1));
+                gamePane.add(Buttons[i][j], j, i);
+                
+                if (x[i][j]==0){
+                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
+                    Buttons[i][j].setText("O");
+                    Buttons[i][j].setDisable(true);
+                }
+                    
+                else if (x[i][j]==1)
+                {
+                    
+                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
+                    Buttons[i][j].setText("X");
+                    Buttons[i][j].setDisable(true);
+                
+                }
+            }
         }
-        gamePane.add(Buttons[0], 0, 0);
-        gamePane.add(Buttons[1], 1, 0);
-        gamePane.add(Buttons[2], 2, 0);
-        gamePane.add(Buttons[3], 0, 1);
-        gamePane.add(Buttons[4], 1, 1);
-        gamePane.add(Buttons[5], 2, 1);
-        gamePane.add(Buttons[6], 0, 2);
-        gamePane.add(Buttons[7], 1, 2);
-        gamePane.add(Buttons[8], 2, 2);
         gamePane.setHgap(5);
         gamePane.setVgap(5);
         gamePane.setAlignment(Pos.CENTER);
         gameScene = new Scene(borderPane, 500, 320);
     }
+
 
     // Signin window init
     public void signInWinInit() {
@@ -546,7 +566,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         
         if (result.get() == yesButton){
             res.setInvitationReply(true);
-            gameWinInit();
+            gameWinInit(quickGameInitArr);
             currentScene = gameScene;
             ps.setScene(currentScene);
             ps.show();
