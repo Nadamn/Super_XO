@@ -122,11 +122,21 @@ public class Game {
         
         
         // Check for diagonal (check later)
-    
+        
         
         
         // Check for tie case 
         if (lastMovePlayer==9  && (!gameState.equals("1wins")) && (!gameState.equals("2wins"))  )
                gameState="tie";
+            
+            
+        
+        
+        
+    
+    
+    
     }
+    
 }
+ 
