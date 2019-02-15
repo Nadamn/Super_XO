@@ -227,6 +227,29 @@ class ChatHandler extends Thread {
                 }
             }
                 break;
+                
+            case "cancel invitation":
+            { 
+            
+                System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
+            
+                for(ChatHandler ch: clients)
+                {   
+                    if (ch.getUserName().equals(mess.getDistUserName()))
+                    {  
+                        r.setUserName(mess.getUserName());
+                        r.setDestUsername(mess.getDistUserName());
+                        r.setReponseType("cancel invitation"); 
+                        ch.ps.writeObject(r);
+
+                        System.out.println("cancel invitation sent to client 2");
+
+                        break;
+                    }
+                }
+            }
+                break;
+
             case "invitation response":
             { 
                 //System.out.println("invite response is recieved");
