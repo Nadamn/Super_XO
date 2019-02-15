@@ -219,7 +219,9 @@ class ChatHandler extends Thread {
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation request"); 
                         ch.ps.writeObject(r);
-
+                        Server.updateStatus(mess.getUserName(),2);
+                        Server.updateStatus(mess.getDistUserName(),2);
+                        
                         System.out.println("invitaion sent to client 2");
 
                         break;
@@ -241,7 +243,7 @@ class ChatHandler extends Thread {
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("cancel invitation"); 
                         ch.ps.writeObject(r);
-
+                        Server.updateStatus(mess.getUserName(),1);
                         System.out.println("cancel invitation sent to client 2");
 
                         break;
@@ -267,6 +269,16 @@ class ChatHandler extends Thread {
                         r.setInvitationReply(mess.getInvitationReply());
                         System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
                         ch.ps.writeObject(r);
+                        if(mess.getInvitationReply())
+                        {
+                            Server.updateStatus(mess.getUserName(),2);
+                            Server.updateStatus(mess.getUserName(),2);
+                        }
+                        else
+                        {
+                            Server.updateStatus(mess.getUserName(),1);
+                            Server.updateStatus(mess.getUserName(),1);                       
+                        }
                         // Cheking if player 2 accepted the invitation or not 
                          if (r.getInvitationReply())   //if yes we need to instantiate game object
                              g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
