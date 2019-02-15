@@ -198,7 +198,7 @@ class ChatHandler extends Thread {
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation request"); 
-                        ch.ps.writeObject(req);
+                        ch.ps.writeObject(r);
                         System.out.println("invitaion sent to client 2");
                         break;
                     }
