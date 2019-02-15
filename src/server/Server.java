@@ -6,6 +6,7 @@
 package server;
 
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import static server.ChatHandler.clients;
 
 /**
  *
@@ -142,7 +144,7 @@ public class Server extends Application {
         }    
     
     
-    public static void updateStatus(String name,int st){
+    public static void updateStatus(String name,int st) throws IOException{
         
         for (int i = 0; i < users.size(); i++)
         {
@@ -154,6 +156,19 @@ public class Server extends Application {
                 break;
             }
         } 
+        
+        
+        //public void sendToAll(Request mess) throws IOException{
+        Response r = new Response();
+        r.setReponseStatus(true);
+        r.setReponseType("status update");
+        r.setUsers(Server.myServ.users);
+        r.setStatus(status);
+        for( ChatHandler ch : ChatHandler.clients){
+            System.out.println("sent");
+            ch.ps.writeObject(r);
+        } 
+     
 
 
     }
