@@ -169,7 +169,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
         System.out.println(r.getReponseType());
 
-        if (r.getReponseType().equals("signin") || r.getReponseType().equals("status update")) {
+        if (r.getReponseType().equals("signin")) {
             System.out.println("Login request received");
             if (r.getReponseStatus()) {
                 System.out.println("login success");
@@ -277,7 +277,19 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 }
             });
 
-        }
+        } 
+//        else if (r.getReponseType().equals("statuses update")) {
+//            usernames = r.getUsers();
+//            playersStatus = r.getStatus();
+//            for (int i = 0; i < usernames.size(); i++) {
+//                allPlayers = new HashMap<>();
+//                allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
+//            }
+//            currentScene = mainWindowScene;
+//            ps.setScene(currentScene);
+//            ps.show();
+//            System.out.println("new update");
+//        }
 
     }
 
