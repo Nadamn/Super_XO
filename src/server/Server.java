@@ -161,7 +161,7 @@ public class Server extends Application {
         //public void sendToAll(Request mess) throws IOException{
         Response r = new Response();
         r.setReponseStatus(true);
-        r.setReponseType("status update");
+        r.setReponseType("statuses update");
         r.setUsers(Server.myServ.users);
         r.setStatus(status);
         for( ChatHandler ch : ChatHandler.clients){
