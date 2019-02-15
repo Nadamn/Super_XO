@@ -103,6 +103,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //--------------------------------------variables for invitation dialogs ---------------------------------
     Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
     Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
+    Boolean player1Cancelled = false;
     
     
     public Boolean connectToServer() {
@@ -266,15 +267,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 }
             });
             
-        } else if (r.getReponseType().equals("invitation cancelled from player1")) {
-            System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName());
+        } else if (r.getReponseType().equals("cancel invitation")) {
+            System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName()+"blalalalal");
 
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (r.getInvitationReply()) {
-                        inviteConfirm.close();
-                    }
+                    player1Cancelled = true;
                 }
             });
 
@@ -604,21 +603,38 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         res.setDistUserName(r.getUserName());
 
         if (result.get() == yesButton) {
-            res.setInvitationReply(true);
-            gameWinInit(newGameInitArr);
+            if(player1Cancelled){
+                invitationDeclined.setTitle("Invitation Response");
+                invitationDeclined.setContentText(r.getUserName() + " cancelled his invitation");
+                invitationDeclined.showAndWait();
+            } else {
+                res.setInvitationReply(true);
+                gameWinInit(newGameInitArr);
 
-            System.out.println("Hello I accepted the invitaion!!!");
-            currentScene = gameScene;
-            /////////// Add line to prevent player 2 from playing any button
-            ps.setScene(currentScene);
-            ps.show();
+                System.out.println("Hello I accepted the invitaion!!!");
+                currentScene = gameScene;
+                /////////// Add line to prevent player 2 from playing any button
+                ps.setScene(currentScene);
+                ps.show();
+                try {
+                    printStream.writeObject(res);
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         } else {
-            res.setInvitationReply(false);
-        }
-        try {
-            printStream.writeObject(res);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            if(player1Cancelled){
+                invitationDeclined.setTitle("Invitation Response");
+                invitationDeclined.setContentText(r.getUserName() + " cancelled his invitation");
+                invitationDeclined.showAndWait();
+            } else {
+                res.setInvitationReply(false);
+                try {
+                    printStream.writeObject(res);
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
 
