@@ -78,9 +78,9 @@ class ChatHandler extends Thread {
                 
                 try {
                     System.out.println("client logout");
+                    Server.updateStatus(username,0);
                     ps.close();
                     dis.close();
-                    Server.updateStatus(username,0);
                     clients.remove(this);
                     s.close();
                     //sendToAll("client removed");

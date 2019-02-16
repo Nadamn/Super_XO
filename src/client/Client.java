@@ -170,9 +170,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         System.out.println(r.getReponseType());
 
         if (r.getReponseType().equals("signin") || r.getReponseType().equals("statuses update")) {
-            System.out.println("Login request received");
+            System.out.println(r.getReponseType());
             if (r.getReponseStatus()) {
                 System.out.println("login success");
+                for (int i = 0; i < r.getStatus().size(); i++)
+                {
+                    System.out.println(r.getStatus().get(i));
+                }
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -182,6 +186,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         for (int i = 0; i < usernames.size(); i++) {
                             allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
                             System.out.println(usernames.get(i));
+                            System.out.println(playersStatus.get(i));
                         }
                         Request req = new Request();
                         req.setRequestType("set username");

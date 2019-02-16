@@ -41,7 +41,7 @@ import static server.ChatHandler.clients;
 public class Server extends Application {
    
     //players from db
-    public DBManager db = new DBManager();
+    public static DBManager db = new DBManager();
     private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
     
     static String[] ar;
@@ -153,6 +153,7 @@ public class Server extends Application {
             {
                 options.get(i).setFill(state(st));
                 status.set(i,st);
+                
                 break;
             }
         } 
@@ -163,9 +164,21 @@ public class Server extends Application {
         r.setReponseStatus(true);
         r.setReponseType("statuses update");
         r.setUsers(Server.myServ.users);
-        r.setStatus(status);
+
+        
+        
+        for (int i = 0; i < users.size(); i++)
+        {
+            System.out.println(status.get(i));
+        }
         for( ChatHandler ch : ChatHandler.clients){
             System.out.println("sent");
+            Player currentPlayer = db.getPlayer(ch.getUserName());
+            String [] playerData = {currentPlayer.getUsername(), currentPlayer.getScore().toString()};
+            r.setCurrentPlayerData(playerData);
+            r.setStatus(status);
+            System.out.println("=====================> ");
+            System.out.println(r.getStatus());
             ch.ps.writeObject(r);
         } 
      
