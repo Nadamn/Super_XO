@@ -169,8 +169,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
         System.out.println(r.getReponseType());
 
-        if (r.getReponseType().equals("signin") || r.getReponseType().equals("statuses update")) {
-            System.out.println(r.getReponseType());
+        if (r.getReponseType().equals("signin")) {
+            System.out.println("Login request received");
             if (r.getReponseStatus()) {
                 System.out.println("login success");
                 for (int i = 0; i < r.getStatus().size(); i++)
@@ -282,7 +282,19 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 }
             });
 
-        }
+        } 
+//        else if (r.getReponseType().equals("statuses update")) {
+//            usernames = r.getUsers();
+//            playersStatus = r.getStatus();
+//            for (int i = 0; i < usernames.size(); i++) {
+//                allPlayers = new HashMap<>();
+//                allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
+//            }
+//            currentScene = mainWindowScene;
+//            ps.setScene(currentScene);
+//            ps.show();
+//            System.out.println("new update");
+//        }
 
     }
 
@@ -499,7 +511,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 Buttons[i][j] = new Button();
                 Buttons[i][j].setMinSize(100, 100);
                 Buttons[i][j].setStyle("-fx-background-color:lightblue");
-                Buttons[i][j].setOnAction(this);
+                Buttons[i][j].setOnAction((EventHandler<ActionEvent>) this);
                 Buttons[i][j].setId("gameButton" + (i * 3 + j + 1));
                 //Buttons[i][j].setText(Integer.toString(i*3+j+1));
                 gamePane.add(Buttons[i][j], j, i);
@@ -710,6 +722,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     ((Button) e.getTarget()).setText("X");
                 }
                 ((Button) e.getTarget()).setDisable(true);
+                req = new Request();
                 req.setRequestType("currentMove");
                 String buttonID = ((Control) e.getSource()).getId();
                 req.setCurrentPlay(Character.getNumericValue(buttonID.charAt(buttonID.length() - 1)));
