@@ -27,7 +27,7 @@ public class DBManager {
         try
         {
             DM.registerDriver(new org.gjt.mm.mysql.Driver());
-            con = DM.getConnection("jdbc:mysql://localhost:3306/xo","root","");
+            con = DM.getConnection("jdbc:mysql://localhost:3306/xo","david","123");
             System.out.println("Success");
             
         }
@@ -123,6 +123,20 @@ public class DBManager {
             Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+    }
+    public void saveGame(String player1,String player2,String game) throws SQLException{
+    
+      /*
+         PreparedStatement ps = con.prepareStatement("SELECT * FROM player WHERE username=?"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
+            ps.setString(1, name);
+            ResultSet rs= ps.executeQuery();
+              */
+        PreparedStatement ps= con.prepareStatement("insert into game(player1,player2,game) values(?,?,?)");
+        ps.setString(0,player1 );
+        ps.setString(1,player2 );
+        ps.setString(2,game );
+        ResultSet rs=ps.executeQuery();
+        
     }
     
     

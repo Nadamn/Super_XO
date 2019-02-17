@@ -754,5 +754,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             ps.setScene(currentScene);
         }
     }
+    public void save_play(String player1,String player2,int game[][]) throws IOException{
+       req=new Request();
+       req.setRequestType("saveGame");
+       req.setGameBoard(game);
+       req.setUserName(player1);
+       req.setDistUserName(player2);
+       ObjectOutputStream os=new ObjectOutputStream(mySocket.getOutputStream());
+       os.writeObject(req);
+    }
 
 }
+

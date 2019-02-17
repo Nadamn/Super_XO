@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -105,7 +106,7 @@ class ChatHandler extends Thread {
     }
     
     
-    public void handleRequest(Request mess) throws IOException{
+    public void handleRequest(Request mess) throws IOException, SQLException{
         Response r = new Response();
         //Request req = new Request();
         
@@ -292,7 +293,17 @@ class ChatHandler extends Thread {
             { 
                 System.out.println("invite request is recieved");
                 this.username = r.getUserName();
+                break;
+            } 
+            
+            case "saveGame":
+            {
+              System.out.println("save game is recieved");
+              
+              DB.saveGame(r.getUserName(), r.getDestUsername(), r.getMessage());
+              
             }
+           
         }
         
      if (mess.getRequestType().equals("signInSubmit") || mess.getRequestType().equals("signUpSubmit") || mess.getRequestType().equals("set username")) 

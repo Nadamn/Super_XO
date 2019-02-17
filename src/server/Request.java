@@ -20,7 +20,15 @@ public class Request implements Serializable {
     private String chatMsg;
     private boolean Reply;
     private String destUserName;
-    
+    private int[][] gameBoard;
+
+    public int[][] getGameBoard() {
+        return gameBoard;
+    }
+
+    public void setGameBoard(int[][] gameBoard) {
+        this.gameBoard = gameBoard;
+    }
     
     public void setInvitationReply(boolean rep){ this.Reply = rep;}
     public boolean getInvitationReply(){ return this.Reply ;}
