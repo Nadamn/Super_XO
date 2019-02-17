@@ -156,21 +156,6 @@ public class Server extends Application {
                 break;
             }
         } 
-        
-        
-        //public void sendToAll(Request mess) throws IOException{
-        Response r = new Response();
-        r.setReponseStatus(true);
-        r.setReponseType("statuses update");
-        r.setUsers(Server.myServ.users);
-        r.setStatus(status);
-        for( ChatHandler ch : ChatHandler.clients){
-            System.out.println("sent");
-            ch.ps.writeObject(r);
-        } 
-     
-
-
     }
     
     
