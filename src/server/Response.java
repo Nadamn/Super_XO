@@ -24,7 +24,15 @@ public class Response implements Serializable {
     private ArrayList<Integer> status ;
     private String [] currentPlayerData;
     private String destinationUsername;
-    
+
+    public int[][] getGameBoard() {
+        return gameBoard;
+    }
+
+    public void setGameBoard(int[][] gameBoard) {
+        this.gameBoard = gameBoard;
+    }
+     private int[][] gameBoard;
     public String getMessage(){
         return this.message;
     }

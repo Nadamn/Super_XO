@@ -282,7 +282,16 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 }
             });
 
-        } 
+        } else if(r.getReponseType().equals("loadGame")){
+           if(r.getReponseStatus()){
+            /* ObjectInputStream is = new ObjectInputStream(s.getInputStream());
+    byte[][] array = (byte[][])is.readObject();
+               */
+            
+               
+           }
+        
+        }
 //        else if (r.getReponseType().equals("statuses update")) {
 //            usernames = r.getUsers();
 //            playersStatus = r.getStatus();

@@ -135,10 +135,22 @@ public class DBManager {
         ps.setString(0,player1 );
         ps.setString(1,player2 );
         ps.setString(2,game );
-        ResultSet rs=ps.executeQuery();
+        int rs=ps.executeUpdate();
         
     }
     
+    public String loadGame(String player1,String player2) throws SQLException{
+     PreparedStatement ps= con.prepareStatement("select * from game where player1=? and player=?");
+     ps.setString(0,player1 );
+     ps.setString(1, player2);
+     ResultSet rs=ps.executeQuery();
+     while(rs.next()){
+     
+      String game=rs.getString(2);
+      return game;
+     }
+     return null;
+    }
     
 ////    public Vector<Game> getAllGames(){
 ////        Vector<Game> games = new Vector<>();

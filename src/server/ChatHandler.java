@@ -5,17 +5,16 @@
  */
 package server;
 
-import java.io.DataInputStream;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.shape.Circle;
 
 /**
  *
@@ -299,9 +298,45 @@ class ChatHandler extends Thread {
             case "saveGame":
             {
               System.out.println("save game is recieved");
+               JsonArray game=new JsonArray();
+              int [][] gameBoard= mess.getGameBoard();
+             //convert array to json array to store in database
+              for(int i=0;i<3;i++){
+                 JsonArray sub=new JsonArray();
+                for(int j=0;i<3;j++){
+                   sub.add(gameBoard[i][j]);
+                 }
+                game.add(sub);
+              }
               
-              DB.saveGame(r.getUserName(), r.getDestUsername(), r.getMessage());
+              DB.saveGame(mess.getUserName(), mess.getDistUserName(),game.toString());
+              break;
+            }
+            case "loadGame":
+            {
+            System.out.println("load game requeist recieved");
+            String game=DB.loadGame(mess.getUserName(), mess.getDistUserName());
+            if(game !=null){
+                JsonParser jsonParser = new JsonParser();
+                // Convert JSON Array String into JSON Array 
+                
+                JsonArray array = jsonParser.parse(game).getAsJsonArray();
+                int[][] gameBoard;
+                 for(int i=0;i<3;i++){
+                     JsonArray sub=array.getAsJsonArray();
+                   for(int j=0;j<3;j++){
+                      arrayFromString.
+                   }
+                  
+                 }
+                 r.setReponseStatus(true);   
+                 r.setGameBoard();
+                 r.setReponseType("loadGame");
               
+            }
+            
+            ps = new ObjectOutputStream(s.getOutputStream());
+            ps.writeObject(r);
             }
            
         }
