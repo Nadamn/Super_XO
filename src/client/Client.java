@@ -122,7 +122,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             Alert serverError = new Alert(Alert.AlertType.ERROR);
             serverError.setTitle("Server Error");
             serverError.setContentText("couldn't connect to server, maybe it's offline or something is wrong");
-            serverError.show();
+            serverError.showAndWait();
             return false;
         }
         Task<Void> task = new Task<Void>() {
@@ -492,12 +492,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         name.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 40));
         name.setFill(green);
 
-        HBox nameHbox = new HBox();
-        nameHbox.getChildren().addAll(name);
-
         HBox topBar = new HBox();
-        topBar.getChildren().addAll(nameHbox, signOutButton);
+        topBar.getChildren().addAll(name, signOutButton);
         topBar.setAlignment(Pos.CENTER_RIGHT);
+        topBar.setSpacing(10);
         topBar.setStyle("-fx-background-color: #000000; -fx-padding: 20px;");
         topBar.prefHeightProperty().bind(mainWindowPane.heightProperty().multiply(0.05));
 
