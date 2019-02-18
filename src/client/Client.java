@@ -108,17 +108,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     ArrayList<String> usernames = new ArrayList<>();
     int[] playersStatus ;
     Map<String, Color> allPlayers = new HashMap<>();
-    String[] currentPlayersData = {};
-
-
-    
-    //--------------------------------------variables for invitation dialogs ---------------------------------
-    Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
-    Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
-    Boolean player1Cancelled = false;
-    
-
-    
+    String[] currentPlayersData = {}; 
     //--------------------------------------variables for invitation dialogs ---------------------------------
     Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
     Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
@@ -238,7 +228,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         currentPlayersData = r.getCurrentPlayerData();
                         System.out.println("SIGN UP TEST CURRENT USER NAME"+currentPlayersData[0]);
                         for (int i = 0; i < usernames.size(); i++) {
-                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
+                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus[i]));
                             System.out.println(usernames.get(i));
                         }
                         initMainWindow();
@@ -461,9 +451,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
 
     }
-    
-    
-    
    
 
 //    //--------------------------------- Start ---------------------------------------------------
@@ -720,40 +707,20 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         borderPane.setCenter(gamePane);
 
         borderPane.setTop(userName);
-
-public void renderButtons(int[][] x){
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                Buttons[i][j] = new Button();
-                Buttons[i][j].setMinSize(100, 100);
-                Buttons[i][j].setStyle("-fx-background-color:lightblue");
-            
-             Buttons[i][j].setId("gameButton" + Integer.toString(i)+Integer.toString(j));
-             Buttons[i][j].setOnAction((EventHandler<ActionEvent>) this);
-             
-                gamePane.add(Buttons[i][j], j, i);
-
-                if (x[i][j] == 0) {
-                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
-                    Buttons[i][j].setText("O");
-                    Buttons[i][j].setDisable(true);
-                   // Buttons[i][j].setc
-                } else if (x[i][j] == 1) {
-
-                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
-                    Buttons[i][j].setText("X");
-                    Buttons[i][j].setDisable(true);
-
-                }
-            }
-        }  
-    }
-
+        
+        
         gamePane.setHgap(5);
         gamePane.setVgap(5);
         gamePane.setAlignment(Pos.CENTER);
         gameScene = new Scene(borderPane, 500, 320);
+        
+        
     }
+
+    
+
+        
+    
 
     // Signin window init
     public void signInWinInit() {

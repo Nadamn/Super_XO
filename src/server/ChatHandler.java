@@ -71,11 +71,12 @@ class ChatHandler extends Thread {
                    
                    
                     
-            } catch (IOException ex) {
-                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (java.lang.Exception ex) {
-                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
+//            catch (IOException ex) {
+//                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (java.lang.Exception ex) {
+//                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
+//            }
 
             catch(Exception e){
                 
@@ -220,7 +221,9 @@ class ChatHandler extends Thread {
                             r.setReponseType("signup");
                             r.setMessage("SignUp Sucessfully");
                             r.setUsers(Server.myServ.users);
-                            r.setStatus(Server.myServ.status);
+//                            r.setStatus(Server.myServ.status);
+                           int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                           r.setStatus(arr);
                             
 
                             this.setUserName(mess.getUserName());
@@ -326,18 +329,30 @@ class ChatHandler extends Thread {
                         r.setInvitationReply(mess.getInvitationReply());
                         System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
 
-                        ch.ps.writeObject(r);
+                        //ch.ps.writeObject(r);
                         // Cheking if player 2 accepted the invitation or not 
                         if (r.getInvitationReply())   //if yes we need to instantiate game object
                             {
-                                g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
-                                Server.updateStatus(mess.getUserName(),2);
-                                Server.updateStatus(mess.getDistUserName(),2);
+//                                g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
+//                                Server.updateStatus(mess.getUserName(),2);
+//                                Server.updateStatus(mess.getDistUserName(),2);
+                                
+                                
+                                r.setPlayer1Name(mess.getDistUserName());
+                            r.setPlayer2Name(mess.getUserName());
+                            r.setGameBoard(quickGameInitArr);
+                            
+                            ch.ps.writeObject(r); 
+                            Server.updateStatus(mess.getUserName(),2);
+                            Server.updateStatus(mess.getUserName(),2);
+                                
+                                
                             }
                         else
                             {
                                 Server.updateStatus(mess.getUserName(),1);
                                 Server.updateStatus(mess.getDistUserName(),1);
+                                ch.ps.writeObject(r); 
                             }
 
                         Response r2 =  new Response();
