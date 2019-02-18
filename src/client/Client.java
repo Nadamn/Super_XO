@@ -98,7 +98,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     Socket mySocket;
     ObjectOutputStream printStream;
     ObjectInputStream dataInStream;
-    String errorMessage = "";
 
     //---------------------------------variables for main window --------------------------------------------------
     Boolean mainWinFlag = false;
@@ -213,8 +212,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
                 System.out.println("invalid user information");
                 System.out.println(r.getMessage());
-                errorMessage = r.getMessage() + " please try again";
-                System.out.println(errorMessage);
             }
 
         } else if (r.getReponseType().equals("signup")) {
@@ -537,7 +534,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 try {
                     printStream.writeObject(req);
                 } catch (IOException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    Alert errorDialog = new Alert(Alert.AlertType.ERROR);
+                    errorDialog.setTitle("Invitaion Error");
+                    errorDialog.setContentText("couldn't send invitation");
+                    errorDialog.showAndWait();
+                    System.out.println("Couldn't send invitation");
                 }
             });
             cancel.setOnAction((ActionEvent event) -> {
@@ -557,7 +558,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 try {
                     printStream.writeObject(req);
                 } catch (IOException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    Alert errorDialog = new Alert(Alert.AlertType.ERROR);
+                    errorDialog.setTitle("Invitaion Error");
+                    errorDialog.setContentText("couldn't cancel invitation");
+                    errorDialog.showAndWait();
+                    System.out.println("Couldn't cancel invitation");
                 }
             });
         });
