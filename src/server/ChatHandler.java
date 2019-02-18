@@ -30,8 +30,9 @@ class ChatHandler extends Thread {
     static boolean finish;
     boolean found;
     private  String username;
-    private Game g;
-    private Integer[][] quickGameInitArr={{2,2,2},{2,2,2},{2,2,2}};
+    //private Game g;
+    private int[][] quickGameInitArr={{2,2,2},{2,2,2},{2,2,2}};
+    
     
     
     public ChatHandler( Socket mys,DBManager DB){
@@ -59,36 +60,37 @@ class ChatHandler extends Thread {
         {
             try{
                     Request mess =  (Request) dis.readObject();
+                    System.out.println("Received request of type "+mess.getRequestType());
                   if( mess == null )
                     {
+                        System.out.println("mess = null");
                         throw new Exception("null");
                     }
-                  
-//                  System.out.println("TEst Test");
-//                  System.out.println(mess.getRequestType());
-//                  System.out.println(mess.getUserName());
-//                  System.out.println(mess.getDistUserName());
-//                  System.out.println("Test End");
+                   
                     handleRequest(mess);
+                   
+                   
                     
-                    
-                    
+            } catch (IOException ex) {
+                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (java.lang.Exception ex) {
+                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
-            catch(Exception e){
-                
-                try {
-                    System.out.println("client logout");
-                    ps.close();
-                    dis.close();
-                    Server.updateStatus(username,0);
-                    clients.remove(this);
-                    s.close();
-                    //sendToAll("client removed");
-                    break;
-                } catch (IOException ex) {
-                    Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
-               }
-        }
+//            catch(Exception e){
+//                
+//                try {
+//                    System.out.println("client logout");
+//                    ps.close();
+//                    dis.close();
+//                    Server.updateStatus(username,0);
+//                    clients.remove(this);
+//                    s.close();
+//                    //sendToAll("client removed");
+//                    break;
+//                } catch (IOException ex) {
+//                    Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
+//               }
+//        }
     }
     }
     
@@ -169,10 +171,9 @@ class ChatHandler extends Thread {
                            if( Server.myServ.users.get(i).equals(mess.getUserName())){
                            
                             
-                            r.setReponseStatus(false);
+                            r.setReponseStatus(false);///////////////////
                             r.setReponseType("signup");
                             r.setMessage("SignUpFailed");
-                           // this.ps.writeObject(r);
                             userExisted=true;
                             break;
                            
@@ -184,15 +185,14 @@ class ChatHandler extends Thread {
                             r.setMessage("SignUp Sucessfully");
                             r.setUsers(Server.myServ.users);
                             r.setStatus(Server.myServ.status);
+                            
                             this.setUserName(mess.getUserName());
+                            String [] playerData = {mess.getUserName(),"0"};
+                            r.setCurrentPlayerData(playerData);
+                            
                             Player p=new Player(mess.getUserName(),mess.getPassWord());
                             boolean s=DB.createNewPlayer(p);
-//                            if (s)
-//                            System.out.println("Adding to data base successfully");
-//                            else
-//                                System.out.println("Not added check again");
-                                
-                            //this.ps.writeObject
+                          
                         } 
             }
                 
@@ -219,14 +219,42 @@ class ChatHandler extends Thread {
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation request"); 
                         ch.ps.writeObject(r);
-                       // System.out.println("invitaion sent to client 2");
+                        Server.updateStatus(mess.getUserName(),2);
+                        Server.updateStatus(mess.getDistUserName(),2);
+                        
+                        System.out.println("invitaion sent to client 2");
+
                         break;
                     }
                 }
             }
                 break;
+                
+            case "cancel invitation":
+            { 
+            
+                System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
+            
+                for(ChatHandler ch: clients)
+                {   
+                    if (ch.getUserName().equals(mess.getDistUserName()))
+                    {  
+                        r.setUserName(mess.getUserName());
+                        r.setDestUsername(mess.getDistUserName());
+                        r.setReponseType("cancel invitation"); 
+                        ch.ps.writeObject(r);
+                        Server.updateStatus(mess.getUserName(),1);
+                        System.out.println("cancel invitation sent to client 2");
+
+                        break;
+                    }
+                }
+            }
+                break;
+
             case "invitation response":
             { 
+                
                 //System.out.println("invite response is recieved");
                 for(ChatHandler ch: clients)
                 {
@@ -241,16 +269,137 @@ class ChatHandler extends Thread {
                         r.setReponseType("invitation response"); 
                         r.setInvitationReply(mess.getInvitationReply());
                         System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
-                        ch.ps.writeObject(r);
-                        // Cheking if player 2 accepted the invitation or not 
-                         if (r.getInvitationReply())   //if yes we need to instantiate game object
-                             g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
-                       // System.out.println("invitaion sent to client 1");
+                        //ch.ps.writeObject(r);
+                        if(mess.getInvitationReply())
+                        {
+                            //Game g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr);
+                            r.setPlayer1Name(mess.getDistUserName());
+                            r.setPlayer2Name(mess.getUserName());
+                            r.setGameBoard(quickGameInitArr);
+                            
+                            ch.ps.writeObject(r); 
+                            Server.updateStatus(mess.getUserName(),2);
+                            Server.updateStatus(mess.getUserName(),2);
+                        }
+                        else
+                        {
+                            Server.updateStatus(mess.getUserName(),1);
+                            Server.updateStatus(mess.getUserName(),1);
+                            ch.ps.writeObject(r);
+                        }
+                        
                         break;
                     }
                 }
             }
                 break;
+                
+                
+              case "moveToO":
+              {
+//                
+                Response gameRes=new Response();
+                gameRes.setReponseType("receiveInO");
+                gameRes.setGameBoard(mess.getGameBoard());
+                gameRes.setPlayer1Name(mess.getPlayer1Name());
+                gameRes.setPlayer2Name(mess.getPlayer2Name());
+                System.out.println("Got the first move");
+                  for(ChatHandler ch: clients){
+                     // if (ch.getUserName().equals(g.getPlayer2Name()))
+                     if (ch.getUserName().equals(mess.getPlayer2Name()))
+                      {
+                          ch.ps.writeObject(gameRes);
+                          
+                          if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="1wins"){
+                              DB.increaseScore(mess.getPlayer1Name()); // Increasing score
+                               Response result = new Response();
+                                 result.setReponseType("win");
+                                 this.ps.writeObject(result); 
+                                 
+                                 result.setReponseType("lose");
+                                 ch.ps.writeObject(result);
+                                 
+                                 
+                                 
+                          }
+                          else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="2wins")
+                          {
+                              DB.increaseScore(mess.getPlayer2Name()); // Increasing score
+                               Response result = new Response();
+                                 result.setReponseType("win");
+                                 ch.ps.writeObject(result);  
+                                 
+                                 result.setReponseType("lose");
+                                 this.ps.writeObject(result);
+                          }
+                           else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="tie")
+                          {
+                               Response result = new Response();
+                                 result.setReponseType("TIE");
+                                 ch.ps.writeObject(result);
+                                 this.ps.writeObject(result);
+                          }
+                          
+                          
+                           
+                          
+                          break;
+                      }
+                  }
+            }
+            break;
+            
+            case "moveToX":{
+                //g.increaseLastMovePlayer();
+                //g.setGameBoard(mess.getGameBoard());
+                Response gameRes=new Response();
+                gameRes.setReponseType("receiveInX");
+                gameRes.setPlayer1Name(mess.getPlayer1Name());
+                gameRes.setPlayer2Name(mess.getPlayer2Name());
+                gameRes.setGameBoard(mess.getGameBoard());     
+                  for(ChatHandler ch: clients){
+                      if (ch.getUserName().equals(mess.getPlayer1Name()))
+                      {
+                          ch.ps.writeObject(gameRes);
+                          
+                          
+                          if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="1wins"){
+                              
+                              DB.increaseScore(mess.getPlayer1Name()); // Increasing score
+                               Response result = new Response();
+                                 result.setReponseType("win");
+                                 ch.ps.writeObject(result); 
+                                 
+                                 result.setReponseType("lose");
+                                 this.ps.writeObject(result);
+                                 
+                          }
+                          else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="2wins")
+                          {
+                              DB.increaseScore(mess.getPlayer2Name()); // Increasing score
+                               Response result = new Response();
+                                 result.setReponseType("win");
+                                 this.ps.writeObject(result); 
+                                 
+                                 result.setReponseType("lose");
+                                 ch.ps.writeObject(result);
+                          }
+                           else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="tie")
+                          {
+                               Response result = new Response();
+                                 result.setReponseType("TIE");
+                                 ch.ps.writeObject(result);
+                                 this.ps.writeObject(result);
+                          }
+                          
+                          
+                          
+                          break;
+                      }
+                  }
+            }
+            break;
+            
             case "set username":
             { 
                 System.out.println("invite request is recieved");
@@ -290,6 +439,71 @@ class ChatHandler extends Thread {
         } 
         System.out.println("all users removed");
     }
+    
+    
+    
+    
+    
+    
+    public String checkWinner(int[][]board,int lastMoveRow,int lastMoveCol){                // will be called after each increase in lastmove player
+                                                                             // dummy method for 3*3 boards only
+                                                                             
+         String gameState="Nothing Yet";
+         int NumofMoves=0;
+         
+         
+         for(int i=0;i<3;i++)
+           for(int j=0;j<3;j++)
+               if(board[i][j]==1 || board[i][j]==0)
+                   NumofMoves++;
+         
+        // Check for horizontal
+          if ( (board[lastMoveRow][0] == board[lastMoveRow][2])&& (board[lastMoveRow][1] == board[lastMoveRow][2]) && (board[lastMoveRow][0] == board[lastMoveRow][lastMoveCol]) )
+          {
+               if (board[lastMoveRow][lastMoveCol]==1)
+                 return  gameState="1wins";
+               if (board[lastMoveRow][lastMoveCol]==0)
+                 return  gameState="2wins";
+          
+          }
+                        
+        
+        // Check for vertical 
+        
+          if ( (board[0][lastMoveCol] == board[2][lastMoveCol])&& (board[1][lastMoveCol] == board[2][lastMoveCol]) && (board[0][lastMoveCol] == board[lastMoveRow][lastMoveCol]) )
+          {
+               if (board[lastMoveRow][lastMoveCol]==1)
+                 return gameState="1wins";
+               if (board[lastMoveRow][lastMoveCol]==0)
+                 return  gameState="2wins";
+          
+          }
+        
+        
+        
+        // Check for diagonal (check later)
+        
+        
+        
+        // Check for tie case 
+        if (NumofMoves==9  && (!gameState.equals("1wins")) && (!gameState.equals("2wins"))  )
+               return gameState="tie";
+            
+            
+        
+        
+        
+    return gameState;
+    
+    
+    }
+    
+
+ 
+    
+    
+    
+    
 }
 
 
