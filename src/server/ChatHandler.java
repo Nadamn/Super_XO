@@ -507,15 +507,18 @@ class ChatHandler extends Thread {
     }
  
     public static void close(){
+        
+        Response r2 =  new Response();
+        r2.setReponseType("server closed");                     
+        
         for( ChatHandler ch : clients){
             try {
+                    ch.ps.writeObject(r2);
                     ch.finish = true;
                     ch.ps.close();
                     ch.dis.close();
-                    Server.updateStatus(ch.getUserName(),0);
                     clients.remove(ch);
                     ch.s.close();
-                    break;
                 } catch (IOException ex) {
                     Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -137,17 +137,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 while (true) {
                     try {
                         Response r;
-                        try {
-                            r = (Response) dataInStream.readObject();
+                        
+                        r = (Response) dataInStream.readObject();
 
-                            handleResponse(r);
-                            //System.out.println("response recieved\n");
-                        } catch (ClassNotFoundException ex) {
+                        handleResponse(r);
 
-                            System.out.println("here1");
-                            break;
-                            //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-                        }
 
                     } catch (IOException ex) {
                         try {
@@ -156,6 +150,22 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                             dataInStream.close();
                             mySocket.close();
                             System.out.println("Server closed");
+                            Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                initMainWindow();  
+
+                                STATE.setTitle("Sorry Server is shutdown " );
+                                STATE.setHeaderText("sorry");
+                                STATE.setContentText("Sorry for this but your data is lost ");
+                                ButtonType backToMainWindow = new ButtonType("close application");
+                                STATE.getButtonTypes().setAll(backToMainWindow);
+                                Optional<ButtonType> result = STATE.showAndWait();
+                                System.exit(0);              
+                            }
+                            });
+                             break;
                         } catch (IOException ex1) {
                             System.out.println("here2");
                             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex1);
@@ -324,6 +334,29 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     }
                 });
         }
+        
+        else if (r.getReponseType().equals("server closed")){
+            //handle this ya nadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+             System.out.println("server closed");
+             Platform.runLater(new Runnable() {
+                    @Override
+                public void run() {
+                    
+                    initMainWindow();  
+                 
+                    STATE.setTitle("Sorry Server is shutdown " );
+                    STATE.setHeaderText("sorry");
+                    STATE.setContentText("Sorry for this but your data is lost ");
+                    ButtonType backToMainWindow = new ButtonType("close application");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                    System.exit(0);
+                 
+                }
+                });
+        }
+        
+        
         else if (r.getReponseType().equals("receiveInX")){
         
                   Platform.runLater(new Runnable() {

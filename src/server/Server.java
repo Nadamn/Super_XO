@@ -82,8 +82,17 @@ public class Server extends Application {
                         @Override
                         public void handle(ActionEvent event) {
                             System.out.println("start!");
+                             try{
+                                 myServ.start();
+
+                                }
+                                catch( Exception e){
+                                    e.printStackTrace();
+                                   }
+                           
                         }
                     });
+            
             
             Button buttonStop = new Button("Stop");
             buttonStop.setPrefSize(100, 20);
@@ -91,6 +100,8 @@ public class Server extends Application {
                     @Override
                         public void handle(ActionEvent event) {
                             System.out.println("stop!");
+                            myServ.close();
+                            System.exit(0);
                         }
                     });
             
