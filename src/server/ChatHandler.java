@@ -82,6 +82,16 @@ class ChatHandler extends Thread {
                     dis.close();
                     Server.updateStatus(username,0);
                     clients.remove(this);
+                    
+                    Response r2 =  new Response();
+                    int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                    r2.setReponseType("status update");
+                    r2.setUsers(Server.myServ.users);                       
+                    r2.setStatus(arr);
+                    for( ChatHandler ch2 : clients)
+                        {
+                            ch2.ps.writeObject(r2);                              
+                        }
                     s.close();
                     //sendToAll("client removed");
                     break;
@@ -116,10 +126,13 @@ class ChatHandler extends Thread {
             
             case "signInSubmit":
             {       found = false;
-                    for (int i=0; i< Server.myServ.users.size(); i++) {
-                            if( Server.myServ.users.get(i).equals(mess.getUserName())){
+                    for (int i=0; i< Server.myServ.users.size(); i++) 
+                        {
+                            if( Server.myServ.users.get(i).equals(mess.getUserName()))
+                            {
                                 found = true;
-                                if( Server.myServ.passwords.get(i).equals(mess.getPassWord())){       
+                                if( Server.myServ.passwords.get(i).equals(mess.getPassWord()))
+                                {       
                                     // return true 
                                     Player currentPlayer = DB.getPlayer(mess.getUserName());
                                     String [] playerData = {currentPlayer.getUsername(), currentPlayer.getScore().toString()};
@@ -127,25 +140,46 @@ class ChatHandler extends Thread {
                                     r.setReponseType("signin");
                                     r.setUsers(Server.myServ.users);
                                     this.setUserName(mess.getUserName());
-                                    r.setStatus(Server.myServ.status);
+                                    
+                                    int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                                    
+                                    r.setStatus(arr);
                                     r.setCurrentPlayerData(playerData);
-                                    //this.ps.writeObject(r);
+                                    
+                                    //  update status in server
                                     Server.updateStatus(mess.getUserName(),1);
 //                                    System.out.println("response sent");
 //                                    System.out.println(DB.getPlayer(mess.getUserName()).getScore());
-                                    
+
+                                    // update clients with new updates
+                                    Response r2 =  new Response();
+                                    arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                                    r2.setReponseType("status update");
+                                    r2.setUsers(Server.myServ.users);                       
+                                    r2.setStatus(arr);
+                                    for( ChatHandler ch2 : clients)
+                                        {
+                                            System.out.println("inner loop");
+                                            System.out.println(r2.getStatus());
+                                            if( !ch2.username.equals(mess.getUserName()))
+                                                {
+                                                    System.out.println("sent loop");
+                                                    ch2.ps.writeObject(r2);
+                                                } 
+                                        }
                                 }
-                                else{
-                                    //return false worng password
-                                    
-                                    r.setReponseStatus(false);
-                                    r.setReponseType("signin");
-                                    r.setMessage("wrong password");
-                                    //this.ps.writeObject(r);
-                                    //System.out.println("response sent");
-                                }
+                                else
+                                    {
+                                        //return false worng password
+
+                                        r.setReponseStatus(false);
+                                        r.setReponseType("signin");
+                                        r.setMessage("wrong password");
+                                        //this.ps.writeObject(r);
+                                        //System.out.println("response sent");
+                                    }
                             }
-                           // System.out.println("1");
+                           
                         }
                         
                         //return false user not found
@@ -183,7 +217,7 @@ class ChatHandler extends Thread {
                             r.setReponseType("signup");
                             r.setMessage("SignUp Sucessfully");
                             r.setUsers(Server.myServ.users);
-                            r.setStatus(Server.myServ.status);
+
                             this.setUserName(mess.getUserName());
                             Player p=new Player(mess.getUserName(),mess.getPassWord());
                             boolean s=DB.createNewPlayer(p);
@@ -218,8 +252,26 @@ class ChatHandler extends Thread {
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation request"); 
+                        Server.updateStatus(mess.getUserName(),2);
+                        Server.updateStatus(mess.getDistUserName(),2);
                         ch.ps.writeObject(r);
 
+                        Response r2 =  new Response();
+                        int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        r2.setReponseType("status update");
+                        r2.setUsers(Server.myServ.users);                       
+                        r2.setStatus(arr);
+                        for( ChatHandler ch2 : clients)
+                            {
+                                System.out.println(r2.getStatus());
+                                if( !ch2.username.equals(mess.getUserName()) && !ch2.username.equals(mess.getDistUserName()))
+                                    {
+                                        System.out.println("sent loop");
+                                        ch2.ps.writeObject(r2);
+                                    } 
+                            }
+                        
                         System.out.println("invitaion sent to client 2");
 
                         break;
@@ -258,8 +310,7 @@ class ChatHandler extends Thread {
                     if (ch.getUserName().equals(mess.getDistUserName()))
                     {
                         System.out.println(mess.getUserName());
-                        System.out.println(mess.getUserName());
-                        System.out.println(mess.getUserName());
+
                         
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
@@ -268,9 +319,33 @@ class ChatHandler extends Thread {
                         System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
                         ch.ps.writeObject(r);
                         // Cheking if player 2 accepted the invitation or not 
-                         if (r.getInvitationReply())   //if yes we need to instantiate game object
-                             g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
-                       // System.out.println("invitaion sent to client 1");
+                        if (r.getInvitationReply())   //if yes we need to instantiate game object
+                            {
+                                g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
+                                Server.updateStatus(mess.getUserName(),2);
+                                Server.updateStatus(mess.getDistUserName(),2);
+                            }
+                        else
+                            {
+                                Server.updateStatus(mess.getUserName(),1);
+                                Server.updateStatus(mess.getDistUserName(),1);
+                            }
+
+                        Response r2 =  new Response();
+                        int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        r2.setReponseType("status update");
+                        r2.setUsers(Server.myServ.users);                       
+                        r2.setStatus(arr);
+                        for( ChatHandler ch2 : clients)
+                            {
+                                System.out.println(r2.getStatus());
+                                if( !ch2.username.equals(mess.getUserName()) && !ch2.username.equals(mess.getDistUserName()))
+                                    {
+                                        System.out.println("sent loop");
+                                        ch2.ps.writeObject(r2);
+                                    } 
+                            }
                         break;
                     }
                 }

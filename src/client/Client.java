@@ -96,7 +96,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //---------------------------------variables for main window --------------------------------------------------
     Boolean mainWinFlag = false;
     ArrayList<String> usernames = new ArrayList<>();
-    ArrayList<Integer> playersStatus = new ArrayList<>();
+    int[] playersStatus ;
     Map<String, Color> allPlayers = new HashMap<>();
     String[] currentPlayersData = {};
     
@@ -131,7 +131,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         Response r;
                         try {
                             r = (Response) dataInStream.readObject();
-
+                            
                             handleResponse(r);
                             //System.out.println("response recieved\n");
                         } catch (ClassNotFoundException ex) {
@@ -180,7 +180,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         playersStatus = r.getStatus();
                         currentPlayersData = r.getCurrentPlayerData();
                         for (int i = 0; i < usernames.size(); i++) {
-                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
+                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus[i]));
                             System.out.println(usernames.get(i));
                         }
                         Request req = new Request();
@@ -280,19 +280,25 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         }
         else if (r.getReponseType().equals("status update")){
             System.out.println("Hola");
-            usernames = r.getUsers();
-            playersStatus = r.getStatus();
-            allPlayers.clear();
-            System.out.println("cleared");
-            for (int i = 0; i < r.getUsers().size(); i++) {
-                allPlayers.put(r.getUsers().get(i), server.Server.state(r.getStatus().get(i)));
-                System.out.println(r.getUsers().get(i));
-                System.out.println(r.getStatus().get(i));
-            }
-            initMainWindow();
-            currentScene = mainWindowScene;
-            ps.setScene(currentScene);
-            ps.show();
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() { 
+                    usernames = r.getUsers();
+                    playersStatus = r.getStatus();
+                    allPlayers.clear();
+                    System.out.println("cleared");
+                    for (int i = 0; i < r.getUsers().size(); i++) {
+                        allPlayers.put(r.getUsers().get(i), server.Server.state(r.getStatus()[i]));
+                        System.out.println(r.getUsers().get(i));
+                        System.out.println(r.getStatus()[i]);
+                    }
+                    initMainWindow();
+                    currentScene = mainWindowScene;
+                    ps.setScene(currentScene);
+                    ps.show();
+            
+                    }
+            });
         }
 
     }
