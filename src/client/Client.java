@@ -76,7 +76,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //-------------------------------- Game variables ---------------------------------------------------------------
     Integer currentMove = 0;    // from 1 to 9 
     boolean isPlayerTypeX; // true for player x false for player y
-    String otherPlayerName; //we may not use this (check later)
+    String otherPlayerName; //we may not use this (check later);
     int[][] newGameInitArr = {{2, 2, 2}, {2, 2, 2}, {2, 2, 2}};
     int [][] gameBoard={{2, 2, 2}, {2, 2, 2}, {2, 2, 2}};
     boolean playFlag;
@@ -86,6 +86,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     String Player2Name;
     String PlayMode;
     Board machineBoard;
+
 
     //------------------------------ Colors --------------------------------------------------------------------------    
     static Color red = Color.RED;
@@ -105,9 +106,18 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //---------------------------------variables for main window --------------------------------------------------
     Boolean mainWinFlag = false;
     ArrayList<String> usernames = new ArrayList<>();
-    ArrayList<Integer> playersStatus = new ArrayList<>();
+    int[] playersStatus ;
     Map<String, Color> allPlayers = new HashMap<>();
     String[] currentPlayersData = {};
+
+
+    
+    //--------------------------------------variables for invitation dialogs ---------------------------------
+    Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
+    Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
+    Boolean player1Cancelled = false;
+    
+
     
     //--------------------------------------variables for invitation dialogs ---------------------------------
     Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
@@ -176,7 +186,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
         System.out.println(r.getReponseType());
 
-        if (r.getReponseType().equals("signin") || r.getReponseType().equals("statuses update")) {
+
+        if (r.getReponseType().equals("signin")) {
+
             System.out.println("Login request received");
             if (r.getReponseStatus()) {
                 System.out.println("login success");
@@ -187,7 +199,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         playersStatus = r.getStatus();
                         currentPlayersData = r.getCurrentPlayerData();
                         for (int i = 0; i < usernames.size(); i++) {
-                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
+                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus[i]));
                             System.out.println(usernames.get(i));
                         }
                         
@@ -263,6 +275,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 @Override
                 public void run() {
                     if (r.getInvitationReply()) {
+
                         PlayMode="human";
                         playFlag=true;
                         isPlayerTypeX=true;
@@ -272,6 +285,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         gameWinInit(currentPlayersData[0]);
                       //  renderButtons(newGameInitArr);
                         renderButtons(gameBoard);
+
+
                         currentScene = gameScene;
                         ps.setScene(currentScene);
                         ps.show();
@@ -300,6 +315,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             });
 
         }
+
         else if (r.getReponseType().equals("receiveInO")){
             
              System.out.println("Receeeeeeiiiiiveeeeddddd");
@@ -419,6 +435,30 @@ public class Client extends Application implements EventHandler<ActionEvent> {
              
         
         }
+
+        else if (r.getReponseType().equals("status update")){
+            System.out.println("Hola");
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() { 
+                    usernames = r.getUsers();
+                    playersStatus = r.getStatus();
+                    allPlayers.clear();
+                    System.out.println("cleared");
+                    for (int i = 0; i < r.getUsers().size(); i++) {
+                        allPlayers.put(r.getUsers().get(i), server.Server.state(r.getStatus()[i]));
+                        System.out.println(r.getUsers().get(i));
+                        System.out.println(r.getStatus()[i]);
+                    }
+                    initMainWindow();
+                    currentScene = mainWindowScene;
+                    ps.setScene(currentScene);
+                    ps.show();
+            
+                    }
+            });
+        }
+
 
     }
     
@@ -678,7 +718,37 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         btnsPane.setVgap(50);
         borderPane.setLeft(btnsPane);
         borderPane.setCenter(gamePane);
+
         borderPane.setTop(userName);
+
+public void renderButtons(int[][] x){
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Buttons[i][j] = new Button();
+                Buttons[i][j].setMinSize(100, 100);
+                Buttons[i][j].setStyle("-fx-background-color:lightblue");
+            
+             Buttons[i][j].setId("gameButton" + Integer.toString(i)+Integer.toString(j));
+             Buttons[i][j].setOnAction((EventHandler<ActionEvent>) this);
+             
+                gamePane.add(Buttons[i][j], j, i);
+
+                if (x[i][j] == 0) {
+                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
+                    Buttons[i][j].setText("O");
+                    Buttons[i][j].setDisable(true);
+                   // Buttons[i][j].setc
+                } else if (x[i][j] == 1) {
+
+                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
+                    Buttons[i][j].setText("X");
+                    Buttons[i][j].setDisable(true);
+
+                }
+            }
+        }  
+    }
+
         gamePane.setHgap(5);
         gamePane.setVgap(5);
         gamePane.setAlignment(Pos.CENTER);
@@ -769,13 +839,16 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         res.setUserName(currentPlayersData[0]);
         res.setDistUserName(r.getUserName());
 
+
         if (result.get() == yesButton) {            
+
             if(player1Cancelled){
                 invitationDeclined.setTitle("Invitation Response");
                 invitationDeclined.setContentText(r.getUserName() + " cancelled his invitation");
                 invitationDeclined.showAndWait();
             } else {
                 res.setInvitationReply(true);
+
                 //gameWinInit(newGameInitArr);
                 PlayMode="human";
                 playFlag=false;
@@ -790,6 +863,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 
                 ps.show();
                 
+
                 try {
                     printStream.writeObject(res);
                 } catch (IOException ex) {
@@ -1038,6 +1112,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             currentScene = signInScene;
             ps.setScene(currentScene);
 
+
         }
     else if (currentScene == mainWindowScene) {
         
@@ -1073,6 +1148,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         
         
             
+
         }
     }
 
