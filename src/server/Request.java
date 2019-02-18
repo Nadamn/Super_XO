@@ -1,3 +1,5 @@
+//
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -20,6 +22,51 @@ public class Request implements Serializable {
     private String chatMsg;
     private boolean Reply;
     private String destUserName;
+    
+    private Integer currentMoveRow;
+    private Integer currentMoveCol;
+  
+   
+    private int[][] gameBoard;
+    private String player1Name;
+    private String player2Name;
+  
+    
+    
+    
+    public void setPlayer1Name(String x){  
+        this.player1Name=x;
+    }
+    
+    public String getPlayer1Name(){  
+     return this.player1Name;
+    }
+    
+     public void setPlayer2Name(String x){  
+        this.player2Name=x;
+    }
+    
+    public String getPlayer2Name(){  
+     return this.player2Name;
+    }
+    
+    
+    public void setGameBoard(int[][] x){
+    this.gameBoard=x;
+    }
+    
+    //////////////////////
+    
+    public int[][] getGameBoard(){
+    return this.gameBoard;
+    }
+    
+    
+    public void setCurrentMoveRow(Integer x){this.currentMoveRow=x;}
+    public Integer getCurrentMoveRow(){return this.currentMoveRow;}
+    
+    public void setCurrentMoveCol(Integer x){this.currentMoveCol=x;}
+    public Integer getCurrentMoveCol(){return this.currentMoveCol;}
     
     
     public void setInvitationReply(boolean rep){ this.Reply = rep;}

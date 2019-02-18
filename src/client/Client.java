@@ -23,6 +23,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
@@ -75,8 +76,17 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     //-------------------------------- Game variables ---------------------------------------------------------------
     Integer currentMove = 0;    // from 1 to 9 
     boolean isPlayerTypeX; // true for player x false for player y
-    String otherPlayerName; //we may not use this (check later)
-    Integer[][] newGameInitArr = {{2, 2, 2}, {2, 2, 2}, {2, 2, 2}};
+    String otherPlayerName; //we may not use this (check later);
+    int[][] newGameInitArr = {{2, 2, 2}, {2, 2, 2}, {2, 2, 2}};
+    int [][] gameBoard={{2, 2, 2}, {2, 2, 2}, {2, 2, 2}};
+    boolean playFlag;
+    Button[][] Buttons = new Button[3][3];
+    GridPane gamePane;
+    String Player1Name;
+    String Player2Name;
+    String PlayMode;
+    Board machineBoard;
+
 
     //------------------------------ Colors --------------------------------------------------------------------------    
     static Color red = Color.RED;
@@ -86,26 +96,35 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     TextField userameTextFld;
     PasswordField passwordFld;
     boolean finish;
-    boolean isSignIn = true;   // Flag to make difference between sign in and sign up scenes 
+    boolean isSignIn;   // Flag to make difference between sign in and sign up scenes 
     //---------------------------------variables for landing and signin windows---------------------------------------
     Socket mySocket;
     ObjectOutputStream printStream;
     ObjectInputStream dataInStream;
     String errorMessage = "";
-
+    
     //---------------------------------variables for main window --------------------------------------------------
     Boolean mainWinFlag = false;
     ArrayList<String> usernames = new ArrayList<>();
     int[] playersStatus ;
     Map<String, Color> allPlayers = new HashMap<>();
     String[] currentPlayersData = {};
+
+
     
     //--------------------------------------variables for invitation dialogs ---------------------------------
     Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
     Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
     Boolean player1Cancelled = false;
     
+
     
+    //--------------------------------------variables for invitation dialogs ---------------------------------
+    Alert inviteConfirm = new Alert(Alert.AlertType.CONFIRMATION);
+    Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
+    Boolean player1Cancelled = false;
+    Alert STATE = new Alert(Alert.AlertType.CONFIRMATION);
+ 
     public Boolean connectToServer() {
         finish = false;
         try {
@@ -121,7 +140,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -131,7 +149,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         Response r;
                         try {
                             r = (Response) dataInStream.readObject();
-                            
+
                             handleResponse(r);
                             //System.out.println("response recieved\n");
                         } catch (ClassNotFoundException ex) {
@@ -164,12 +182,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         backgroundThread.start();
         return true;
     }
-
     public void handleResponse(Response r) {
 
         System.out.println(r.getReponseType());
 
+
         if (r.getReponseType().equals("signin")) {
+
             System.out.println("Login request received");
             if (r.getReponseStatus()) {
                 System.out.println("login success");
@@ -183,9 +202,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                             allPlayers.put(usernames.get(i), server.Server.state(playersStatus[i]));
                             System.out.println(usernames.get(i));
                         }
-                        Request req = new Request();
-                        req.setRequestType("set username");
-                        req.setUserName(currentPlayersData[0]);
+                        
                         initMainWindow();
                         currentScene = mainWindowScene;
                         ps.setScene(currentScene);
@@ -216,6 +233,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                       usernames = r.getUsers();
+                        playersStatus = r.getStatus();
+                        currentPlayersData = r.getCurrentPlayerData();
+                        System.out.println("SIGN UP TEST CURRENT USER NAME"+currentPlayersData[0]);
+                        for (int i = 0; i < usernames.size(); i++) {
+                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus.get(i)));
+                            System.out.println(usernames.get(i));
+                        }
+                        initMainWindow();
                         currentScene = mainWindowScene;
                         ps.setScene(currentScene);
                         ps.show();
@@ -249,7 +275,18 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 @Override
                 public void run() {
                     if (r.getInvitationReply()) {
-                        gameWinInit(newGameInitArr);
+
+                        PlayMode="human";
+                        playFlag=true;
+                        isPlayerTypeX=true;
+                        gameBoard=newGameInitArr;
+                        Player1Name=r.getPlayer1Name();
+                        Player2Name=r.getPlayer2Name();
+                        gameWinInit(currentPlayersData[0]);
+                      //  renderButtons(newGameInitArr);
+                        renderButtons(gameBoard);
+
+
                         currentScene = gameScene;
                         ps.setScene(currentScene);
                         ps.show();
@@ -278,6 +315,127 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             });
 
         }
+
+        else if (r.getReponseType().equals("receiveInO")){
+            
+             System.out.println("Receeeeeeiiiiiveeeeddddd");
+                  Platform.runLater(new Runnable() {
+                    @Override
+                  public void run() {
+                  //gameWinInit(r.getGameBoard());
+                  gameBoard=r.getGameBoard();
+                  Player1Name=r.getPlayer1Name();
+                  Player2Name=r.getPlayer2Name();
+                  renderButtons(gameBoard);
+                  currentScene=gameScene;
+                  ps.setScene(currentScene);
+                  ps.show();
+                  playFlag=!playFlag;
+                    }
+                });
+        }
+        else if (r.getReponseType().equals("receiveInX")){
+        
+                  Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                  //gameWinInit(r.getGameBoard());
+                  gameBoard=r.getGameBoard();
+                  Player1Name=r.getPlayer1Name();
+                  Player2Name=r.getPlayer2Name();
+                  renderButtons(gameBoard);
+                  currentScene=gameScene;
+                  ps.setScene(currentScene);
+                  ps.show();
+                  playFlag=!playFlag;
+                    }
+                });
+        }
+        else if (r.getReponseType().equals("win"))
+        {
+            
+            
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    // increasing score
+                    int currentScore=Integer.parseInt(currentPlayersData[1]);
+                    currentScore++;
+                    currentPlayersData[1]= Integer.toString(currentScore); 
+                    
+                    initMainWindow();  
+                    //gameBoard={{2, 2, 2}, {2, 2, 2}, {2, 2, 2}};
+                    STATE.setTitle("Congratulations "+currentPlayersData[0] );
+                    STATE.setHeaderText("You played well");
+                    STATE.setContentText("You Wins :D ");
+                    ButtonType backToMainWindow = new ButtonType("Back to main window");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                     if (result.get() == backToMainWindow){
+                         ///// Add lines to update status on server from busy to free
+                         currentScene=mainWindowScene;
+                         ps.setScene(currentScene);
+                     }   
+                }
+            });
+            
+              
+            
+        
+        }
+        
+        else if (r.getReponseType().equals("lose"))
+        {
+            
+            Platform.runLater(new Runnable() {
+                @Override
+             public void run() {
+                    STATE.setTitle("Unfortunately !!!");
+                    STATE.setHeaderText("Hard Luck "+currentPlayersData[0]);
+                    STATE.setContentText("You Lose :( ");
+                    ButtonType backToMainWindow = new ButtonType("Back to main window");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                     if (result.get() == backToMainWindow){
+                         ///// Add lines to update status on server from busy to free
+                         currentScene=mainWindowScene;
+                         ps.setScene(currentScene);
+                     }   
+                    
+                }
+            });
+            
+            
+            
+        
+        }
+        
+        else if (r.getReponseType().equals("tie"))
+        {
+            
+            Platform.runLater(new Runnable() {
+                @Override
+             public void run() {
+                 STATE.setTitle("No one Wins, "+currentPlayersData[0]+" hope to win next game");
+                 STATE.setHeaderText("Tie");
+                 STATE.setContentText("Tie");
+                 ButtonType backToMainWindow = new ButtonType("Back to main window");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                     if (result.get() == backToMainWindow){
+                         ///// Add lines to update status on server from busy to free
+                         currentScene=mainWindowScene;
+                         ps.setScene(currentScene);
+                         
+                     }    
+                   
+                }
+            });
+           
+             
+        
+        }
+
         else if (r.getReponseType().equals("status update")){
             System.out.println("Hola");
             Platform.runLater(new Runnable() {
@@ -301,21 +459,26 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             });
         }
 
+
     }
+    
+    
+    
+   
 
 //    //--------------------------------- Start ---------------------------------------------------
     @Override
     public void start(Stage primaryStage) throws FileNotFoundException {
         ps = primaryStage;
+        ps.setResizable(false);
         if (!connectToServer()) {
             System.out.println("Couldn't connect to server");
             System.exit(0);
             return;
         }
+        
         landingWinInit();
         signInWinInit();
-        gameWinInit(newGameInitArr);
-
         primaryStage.setTitle("TicTacToe");
         currentScene = landingWindowScene;
         ps.setScene(currentScene);
@@ -350,9 +513,19 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         signOutButton.setId("signOut");
         signOutButton.setOnAction((EventHandler<ActionEvent>) this);
         signOutButton.setPrefSize(170, 30);
+        
+        Text name = new Text("Welcome "+currentPlayersData[0]);
+        name.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 40));
+        name.setFill(green);
+        
+        
+        HBox nameHbox = new HBox();
+        nameHbox.getChildren().addAll(name);
+        //nameHbox.setAlignment(Pos.CENTER_LEFT);
+      
 
         HBox topBar = new HBox();
-        topBar.getChildren().addAll(signOutButton);
+        topBar.getChildren().addAll(nameHbox,signOutButton);
         topBar.setAlignment(Pos.CENTER_RIGHT);
         topBar.setStyle("-fx-background-color: #000000; -fx-padding: 20px;");
         topBar.prefHeightProperty().bind(mainWindowPane.heightProperty().multiply(0.05));
@@ -436,12 +609,14 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
         mainWindowPane.setRight(scorePane);
 
-        //----------------------------Score-------------------------------------------------------------------------------------//
+        //----------------------------Play with machine-------------------------------------------------------------------------------------//
         Button playWithMachine = new Button("Play With Machine");
         playWithMachine.setAlignment(Pos.CENTER);
         playWithMachine.setPrefSize(300, 300);
         playWithMachine.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 40));
         playWithMachine.setWrapText(true);
+        playWithMachine.setId("playWithMachine");
+        playWithMachine.setOnAction((EventHandler<ActionEvent>) this);
 
         mainWindowPane.setCenter(playWithMachine);
 
@@ -449,7 +624,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         mainWindowPaneScrolled.setFitToHeight(true);
         mainWindowPaneScrolled.setFitToWidth(true);
         mainWindowScene = new Scene(mainWindowPaneScrolled);
-        currentScene = mainWindowScene;
+        //currentScene = mainWindowScene;
     }
 
     // Landing window init
@@ -481,14 +656,47 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
     // Game win init
     // Game win init
-    public void gameWinInit(Integer[][] x) {
+    
+    
+    public void renderButtons(int[][] x){
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Buttons[i][j] = new Button();
+                Buttons[i][j].setMinSize(100, 100);
+                Buttons[i][j].setStyle("-fx-background-color:lightblue");
+            
+             Buttons[i][j].setId("gameButton" + Integer.toString(i)+Integer.toString(j));
+             Buttons[i][j].setOnAction((EventHandler<ActionEvent>) this);
+             
+                gamePane.add(Buttons[i][j], j, i);
+
+                if (x[i][j] == 0) {
+                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
+                    Buttons[i][j].setText("O");
+                    Buttons[i][j].setDisable(true);
+                   // Buttons[i][j].setc
+                } else if (x[i][j] == 1) {
+
+                    Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
+                    Buttons[i][j].setText("X");
+                    Buttons[i][j].setDisable(true);
+
+                }
+            }
+        }  
+    }
+    
+    public void gameWinInit(String name) {
+        
         BorderPane borderPane;
-        GridPane gamePane;
+        Text userName= new Text(name);
+        userName.setFont(Font.font("Monotype Corsiva", FontWeight.BOLD, 20));
+        //GridPane gamePane;
         FlowPane btnsPane;
         Button signOut;
         Button quitGame;
         Button newGame;
-        Button[][] Buttons = new Button[3][3];
+     // Button[][] Buttons = new Button[3][3];
         newGame = new Button("New Game");
         newGame.setOnAction((EventHandler<ActionEvent>) this);
         newGame.setId("newGame");
@@ -511,20 +719,25 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         borderPane.setLeft(btnsPane);
         borderPane.setCenter(gamePane);
 
+        borderPane.setTop(userName);
+
+public void renderButtons(int[][] x){
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 Buttons[i][j] = new Button();
                 Buttons[i][j].setMinSize(100, 100);
                 Buttons[i][j].setStyle("-fx-background-color:lightblue");
-                Buttons[i][j].setOnAction(this);
-                Buttons[i][j].setId("gameButton" + (i * 3 + j + 1));
-                //Buttons[i][j].setText(Integer.toString(i*3+j+1));
+            
+             Buttons[i][j].setId("gameButton" + Integer.toString(i)+Integer.toString(j));
+             Buttons[i][j].setOnAction((EventHandler<ActionEvent>) this);
+             
                 gamePane.add(Buttons[i][j], j, i);
 
                 if (x[i][j] == 0) {
                     Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
                     Buttons[i][j].setText("O");
                     Buttons[i][j].setDisable(true);
+                   // Buttons[i][j].setc
                 } else if (x[i][j] == 1) {
 
                     Buttons[i][j].setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
@@ -533,7 +746,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
                 }
             }
-        }
+        }  
+    }
+
         gamePane.setHgap(5);
         gamePane.setVgap(5);
         gamePane.setAlignment(Pos.CENTER);
@@ -624,20 +839,31 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         res.setUserName(currentPlayersData[0]);
         res.setDistUserName(r.getUserName());
 
-        if (result.get() == yesButton) {
+
+        if (result.get() == yesButton) {            
+
             if(player1Cancelled){
                 invitationDeclined.setTitle("Invitation Response");
                 invitationDeclined.setContentText(r.getUserName() + " cancelled his invitation");
                 invitationDeclined.showAndWait();
             } else {
                 res.setInvitationReply(true);
-                gameWinInit(newGameInitArr);
 
+                //gameWinInit(newGameInitArr);
+                PlayMode="human";
+                playFlag=false;
+                isPlayerTypeX=false;
                 System.out.println("Hello I accepted the invitaion!!!");
+                
+                gameWinInit(currentPlayersData[0]);
+                renderButtons(newGameInitArr);
                 currentScene = gameScene;
-                /////////// Add line to prevent player 2 from playing any button
+                
                 ps.setScene(currentScene);
+                
                 ps.show();
+                
+
                 try {
                     printStream.writeObject(res);
                 } catch (IOException ex) {
@@ -669,16 +895,32 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent e) {
         if (currentScene == landingWindowScene) {
-            if (((Control) e.getSource()).getId() == "signUpButton" || ((Control) e.getSource()).getId() == "signInButton") {
+//            if (((Control) e.getSource()).getId() == "signUpButton" || ((Control) e.getSource()).getId() == "signInButton") {
+//                currentScene = signInScene;
+//                ps.setScene(currentScene);
+//
+//                if (((Control) e.getSource()).getId() == "signUpButton") {
+//                    isSignIn = false;
+//                } else {
+//                    isSignIn = true;
+//                }
+//            }
                 currentScene = signInScene;
-                ps.setScene(currentScene);
+                
+              if (  ((Control) e.getSource()).getId() == "signUpButton"   )
+              {   
+                  isSignIn = false;
+              }
+              
+              if (  ((Control) e.getSource()).getId() == "signInButton"   )
+              {
+                  isSignIn = true;
+              }
+              
+              ps.setScene(currentScene);
 
-                if (((Control) e.getSource()).getId() == "signUpButton") {
-                    isSignIn = false;
-                } else {
-                    isSignIn = true;
-                }
-            }
+
+
 
         } else if (currentScene == signInScene) {
             if (((Control) e.getSource()).getId() == "signInSubmitButton") {
@@ -715,47 +957,198 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 currentScene = landingWindowScene;
                 ps.setScene(landingWindowScene);
             }
-        } else if (currentScene == gameScene) {
-            //req.setUserName(p.getUsername());   //  NOTE un comment this after setting current player name (after signing in correctly)
-            if (((Control) e.getSource()).getId().startsWith("gameButton")) {
-                //Handling game buttons
-                currentMove++;
-                ((Button) e.getTarget()).setStyle("-fx-background-color: lightblue;-fx-font-size :4em;-fx-text-fill: red");
-                if (currentMove % 2 == 0) {
-                    ((Button) e.getTarget()).setText("O");
-                } else {
-                    ((Button) e.getTarget()).setText("X");
+        } 
+        
+        else if (currentScene==gameScene) {
+            
+            Integer rowPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(10) );
+            Integer colPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(11) );
+            if(PlayMode.equals("human")){
+                if(playFlag){
+                    // Player X case handling   
+                if (isPlayerTypeX && gameBoard[rowPressed][colPressed]==2 ){
+                   Request moveReq=new Request();
+                   System.out.println(currentPlayersData[0]+ "Played x");
+                   moveReq.setRequestType("moveToO");
+//                   Integer rowPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(10) );
+//                   Integer colPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(11) );
+                   
+                  System.out.println("row "+rowPressed+" col "+colPressed+" is pressed by "+ currentPlayersData[0]);
+                   
+                   moveReq.setCurrentMoveRow(rowPressed);
+                   moveReq.setCurrentMoveCol(colPressed);
+                   gameBoard[rowPressed][colPressed]=1;
+                   moveReq.setGameBoard(gameBoard);
+                   moveReq.setPlayer1Name(Player1Name);
+                   moveReq.setPlayer2Name(Player2Name);
+                  
+                    // Rendering again
+                   //gameWinInit(gameBoard);
+                   renderButtons(gameBoard);
+                   currentScene=gameScene;
+                   ps.setScene(currentScene);
+                   ps.show(); 
+                   playFlag=!playFlag;
+                   
+                   
+                    try {
+                        System.out.println("Sending move req now");
+                        System.out.println("move req of type "+moveReq.getRequestType());
+                        printStream.writeObject(moveReq);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-                ((Button) e.getTarget()).setDisable(true);
-                req.setRequestType("currentMove");
-                String buttonID = ((Control) e.getSource()).getId();
-                req.setCurrentPlay(Character.getNumericValue(buttonID.charAt(buttonID.length() - 1)));
-            } else if (((Control) e.getSource()).getId() == "newGame") {
-                System.out.println("new Game is pressed");
-                req.setRequestType("newGame");
-            } else if (((Control) e.getSource()).getId() == "quitGame") {
-                req.setRequestType("quitGame");
-            } else if (((Control) e.getSource()).getId() == "signOut") {
-                req.setRequestType("signOut");
+                
+                // Player O case handling 
+                if ((!isPlayerTypeX && gameBoard[rowPressed][colPressed]==2)){
+                   Request moveReq=new Request();
+                   moveReq.setRequestType("moveToX");
+                   System.out.println(currentPlayersData[0]+ "Played o");
+                   //Integer rowPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(10) );
+                   //Integer colPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(11) );
+                   moveReq.setCurrentMoveRow(rowPressed);
+                   moveReq.setCurrentMoveCol(colPressed);
+                   //gameBoard=newGameInitArr;
+                   gameBoard[rowPressed][colPressed]=0;
+                   
+                   moveReq.setGameBoard(gameBoard);
+                   moveReq.setPlayer1Name(Player1Name);
+                   moveReq.setPlayer2Name(Player2Name);
+                   renderButtons(gameBoard);
+                   currentScene=gameScene;
+                   ps.setScene(currentScene);
+                    try {
+                        printStream.writeObject(moveReq);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    } 
+                   ps.show(); 
+                   playFlag=!playFlag;
+                }
+                } 
+               
             }
-
-            try {
-                printStream.writeObject(req);
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            
+            else if(PlayMode.equals("machine" ) && machineBoard.board[rowPressed][colPressed]==2){
+                
+                renderButtons(machineBoard.board);
+                Point point=null;  // To store machine move
+                point=  machineBoard.takeMove(rowPressed, colPressed);
+                renderButtons(machineBoard.board);
+                
+                if (machineBoard.isGameOver())
+                {
+                    if (machineBoard.hasXWon()){
+                        
+                        Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    STATE.setTitle("Congratulations "+currentPlayersData[0] );
+                    STATE.setHeaderText("You played well");
+                    STATE.setContentText("You Wins :D ");
+                    ButtonType backToMainWindow = new ButtonType("Back to main window");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                     if (result.get() == backToMainWindow){
+                         ///// Add lines to update status on server from busy to free
+                         currentScene=mainWindowScene;
+                         ps.setScene(currentScene);
+                     }   
+                }
+                  });
+                    
+                    }
+                    else if  (machineBoard.hasOWon()){
+                        
+                         Platform.runLater(new Runnable() {
+                @Override
+             public void run() {
+                    STATE.setTitle("Unfortunately !!!");
+                    STATE.setHeaderText("Hard Luck "+currentPlayersData[0]);
+                    STATE.setContentText("You Lose :( ");
+                    ButtonType backToMainWindow = new ButtonType("Back to main window");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                     if (result.get() == backToMainWindow){
+                         ///// Add lines to update status on server from busy to free
+                         currentScene=mainWindowScene;
+                         ps.setScene(currentScene);
+                     }   
+                    
+                }
+            });
+            
+                    
+                    }
+                    else {
+                        
+                        
+            Platform.runLater(new Runnable() {
+              @Override
+             public void run() {
+                 STATE.setTitle("No one Wins, "+currentPlayersData[0]+" hope to win next game");
+                 STATE.setHeaderText("Tie");
+                 STATE.setContentText("Tie");
+                 ButtonType backToMainWindow = new ButtonType("Back to main window");
+                    STATE.getButtonTypes().setAll(backToMainWindow);
+                    Optional<ButtonType> result = STATE.showAndWait();
+                     if (result.get() == backToMainWindow){
+                         ///// Add lines to update status on server from busy to free
+                         currentScene=mainWindowScene;
+                         ps.setScene(currentScene);
+                     }    
+                   
+                }
+            });
+                    
+                    }
+                }
+                    
             }
-            System.out.println(req.getRequestType());
-        } else if (currentScene == alertScene) {
+        }
+    else if (currentScene == alertScene) {
 
             currentScene = signInScene;
             ps.setScene(currentScene);
 
-        } else if (currentScene == mainWindowScene && ((Control) e.getSource()).getId() == "signOut") {
-            userameTextFld.setText("");
-            passwordFld.setText("");
-            currentScene = signInScene;
-            currentPlayersData = null;
-            ps.setScene(currentScene);
+
+        }
+    else if (currentScene == mainWindowScene) {
+        
+        
+              if (((Control) e.getSource()).getId() == "signOut"){
+              
+                userameTextFld.setText("");
+                passwordFld.setText("");
+                currentScene = signInScene;
+                currentPlayersData = null;
+                ps.setScene(currentScene);
+              
+              }
+              else if(((Control) e.getSource()).getId() == "playWithMachine"){
+               Platform.runLater(new Runnable() {
+              @Override
+             public void run() {
+                 
+                     
+                PlayMode="machine";
+                machineBoard=new Board();// Initialization of machine board
+                gameWinInit(currentPlayersData[0]);
+                renderButtons(machineBoard.board);
+                currentScene=gameScene;
+                ps.setScene(currentScene);
+                ps.show();
+                }
+            });
+                  
+                
+              }
+        
+        
+        
+            
+
         }
     }
 

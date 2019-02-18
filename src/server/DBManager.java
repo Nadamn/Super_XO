@@ -69,6 +69,32 @@ public class DBManager {
         }
     }
     
+    
+    
+    public boolean increaseScore(String userName){
+    
+        
+        try{
+            PreparedStatement ps=con.prepareStatement("UPDATE player SET score = score + 1 WHERE username = ?");
+            ps.setString(1, userName);
+            ps.executeUpdate();
+            
+            System.out.println("Score increased");
+            return true;
+        
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(DBManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+           
+    
+    
+    
+    
+    }
+    
+    
     public Player getPlayer(int id){
         try {
             PreparedStatement ps = con.prepareStatement("SELECT * FROM player WHERE id=?"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
