@@ -434,6 +434,9 @@ class ChatHandler extends Thread {
                                  
                                  result.setReponseType("lose");
                                  ch.ps.writeObject(result);
+                                 Server.updateStatus(this.getUserName(),1);
+                                 Server.updateStatus(ch.getUserName(),1);
+                                 
                                  
                                  
                                  
@@ -447,6 +450,8 @@ class ChatHandler extends Thread {
                                  
                                  result.setReponseType("lose");
                                  this.ps.writeObject(result);
+                                 Server.updateStatus(this.getUserName(),1);
+                                 Server.updateStatus(ch.getUserName(),1);                              
                           }
                            else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="tie")
                           {
@@ -454,6 +459,8 @@ class ChatHandler extends Thread {
                                  result.setReponseType("TIE");
                                  ch.ps.writeObject(result);
                                  this.ps.writeObject(result);
+                                 Server.updateStatus(this.getUserName(),1);
+                                 Server.updateStatus(ch.getUserName(),1);
                           }
                           
                           
@@ -488,6 +495,9 @@ class ChatHandler extends Thread {
                                  
                                  result.setReponseType("lose");
                                  this.ps.writeObject(result);
+                                 Server.updateStatus(this.getUserName(),1);
+                                 Server.updateStatus(ch.getUserName(),1);
+                                 
                                  
                           }
                           else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="2wins")
@@ -499,6 +509,8 @@ class ChatHandler extends Thread {
                                  
                                  result.setReponseType("lose");
                                  ch.ps.writeObject(result);
+                                 Server.updateStatus(this.getUserName(),1);
+                                 Server.updateStatus(ch.getUserName(),1);
                           }
                            else if (checkWinner(mess.getGameBoard(),mess.getCurrentMoveRow(),mess.getCurrentMoveCol())=="tie")
                           {
@@ -506,6 +518,8 @@ class ChatHandler extends Thread {
                                  result.setReponseType("TIE");
                                  ch.ps.writeObject(result);
                                  this.ps.writeObject(result);
+                                 Server.updateStatus(this.getUserName(),1);
+                                 Server.updateStatus(ch.getUserName(),1);
                           }
                           
                           
