@@ -125,7 +125,7 @@ public class Response implements Serializable {
     private boolean reponseStatus;
     private boolean invitationReplyValue;  // false for decline and true for accept and will be checked only for response type "InvitationStatus"
     private String userName;
-    private ArrayList<String> users  ;
+    private String[] users  ;
     private int[] status ;
     private String [] currentPlayerData;
     private String destinationUsername;
@@ -222,11 +222,11 @@ public class Response implements Serializable {
         this.userName = userName;
     }
 
-    public ArrayList<String> getUsers() {
+    public String[] getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList<String> users) {
+    public void setUsers(String[] users) {
         this.users = users;
     }
 

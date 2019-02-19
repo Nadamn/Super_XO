@@ -36,7 +36,7 @@ public class ServerLogic extends Thread{
         //launch(ar);
         try{
         finish = false;
-        start();
+        
         
         }
         catch( Exception e){
