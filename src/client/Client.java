@@ -165,6 +165,19 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                             break;
                         } catch (IOException ex1) {
                             System.out.println("couldn't close streams");
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initMainWindow();
+                                    STATE.setTitle("Sorry Server is shutdown ");
+                                    STATE.setHeaderText("sorry");
+                                    STATE.setContentText("Sorry for this but your data is lost ");
+                                    ButtonType backToMainWindow = new ButtonType("close application");
+                                    STATE.getButtonTypes().setAll(backToMainWindow);
+                                    Optional<ButtonType> result = STATE.showAndWait();
+                                    System.exit(0);
+                                }
+                            });
                         }
                     }
                 }
@@ -181,11 +194,11 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
     public void handleResponse(Response r) {
 
-        System.out.println(r.getReponseType());
+        //System.out.println(r.getReponseType());
 
         if (r.getReponseType().equals("signin")) {
 
-            System.out.println("Login request received");
+            //System.out.println("Login request received");
             if (r.getReponseStatus()) {
                 Platform.runLater(new Runnable() {
                     @Override
@@ -217,8 +230,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     }
                 });
 
-                System.out.println("invalid user information");
-                System.out.println(r.getMessage());
+                //System.out.println("invalid user information");
+                //System.out.println(r.getMessage());
             }
 
         } else if (r.getReponseType().equals("signup")) {
@@ -229,10 +242,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         usernames = r.getUsers();
                         playersStatus = r.getStatus();
                         currentPlayersData = r.getCurrentPlayerData();
-                        System.out.println("SIGN UP TEST CURRENT USER NAME" + currentPlayersData[0]);
+                        //System.out.println("SIGN UP TEST CURRENT USER NAME" + currentPlayersData[0]);
                         for (int i = 0; i < usernames.length; i++) {
                             allPlayers.put(usernames[i], server.Server.state(playersStatus[i]));
-                            System.out.println(usernames[i]);
+                            //System.out.println(usernames[i]);
                         }
                         initMainWindow();
                         currentScene = mainWindowScene;
@@ -255,7 +268,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             }
 
         } else if (r.getReponseType().equals("invitation request")) {
-            System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName());
+            //System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName());
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
@@ -263,7 +276,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 }
             });
         } else if (r.getReponseType().equals("invitation response")) {
-            System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName());
+            //System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName());
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
@@ -301,7 +314,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             });
 
         } else if (r.getReponseType().equals("cancel invitation")) {
-            System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName() + "blalalalal");
+            //System.out.println("Iam " + currentPlayersData[0] + " I got " + r.getReponseType() + "From " + r.getUserName() + "blalalalal");
 
             Platform.runLater(new Runnable() {
                 @Override
@@ -470,10 +483,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 public void run() {
                     allPlayers.clear();                 
                     for (int i = 0; i < r.getUsers().length; i++) {
-                                System.out.println(r.getUsers()[i]);
-                                 
-                             }
-                    for (int i = 0; i < r.getUsers().length; i++) {
                         allPlayers.put(r.getUsers()[i], server.Server.state(r.getStatus()[i]));
                     }
                     initMainWindow();
@@ -494,7 +503,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         ps.setResizable(false);
         
         if (!connectToServer()) {
-            System.out.println("Couldn't connect to server");
+            //System.out.println("Couldn't connect to server");
             System.exit(0);
             return;
         }
@@ -507,7 +516,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         ps.show();
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent close) {
-                System.out.println("client closed");
                 try {
                     //clientListner.stop();
                     mySocket.close();
@@ -516,7 +524,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     System.exit(0);
 
                 } catch (Exception e) {
-                    System.out.println("exc");
+                    //System.out.println("exc");
+                    System.out.println("we couldn't free resources");
                     System.exit(0);
                 }
             }
@@ -549,7 +558,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                                     dataInStream.close();
                                     mySocket.close();
                                 } catch (IOException ex) {
-                                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                                   System.out.println("we couldn't free resources");
                                 }
                                 System.exit(0);              
                             }
@@ -610,7 +619,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     errorDialog.setTitle("Invitaion Error");
                     errorDialog.setContentText("couldn't send invitation");
                     errorDialog.showAndWait();
-                    System.out.println("Couldn't send invitation");
+                    //System.out.println("Couldn't send invitation");
                 }
             });
             cancel.setOnAction((ActionEvent event) -> {
@@ -634,7 +643,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     errorDialog.setTitle("Invitaion Error");
                     errorDialog.setContentText("couldn't cancel invitation");
                     errorDialog.showAndWait();
-                    System.out.println("Couldn't cancel invitation");
+                    //System.out.println("Couldn't cancel invitation");
                 }
             });
         });
@@ -915,7 +924,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 Player1Name=r.getUserName();
                 Player2Name=r.getDestUsername();
                 isPlayerTypeX=false;
-                System.out.println("Hello I accepted the invitaion!!!");
+                //System.out.println("Hello I accepted the invitaion!!!");
                 gameBoard=newGameInitArr;
                 //renderButtons(gameBoard);
                 gameWinInit(currentPlayersData[0],gameBoard);
@@ -930,7 +939,20 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 try {
                     printStream.writeObject(res);
                 } catch (IOException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                   
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        initMainWindow();
+                        STATE.setTitle("Sorry Server is shutdown ");
+                        STATE.setHeaderText("sorry");
+                        STATE.setContentText("Sorry for this but your data is lost ");
+                        ButtonType backToMainWindow = new ButtonType("close application");
+                        STATE.getButtonTypes().setAll(backToMainWindow);
+                        Optional<ButtonType> result = STATE.showAndWait();
+                        System.exit(0);
+                    }
+                });
                 }
             }
         } else {
@@ -944,6 +966,19 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     printStream.writeObject(res);
                 } catch (IOException ex) {
                     System.out.println("something went wrong when player1 cancelled");
+                                                Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initMainWindow();
+                                    STATE.setTitle("Sorry Server is shutdown ");
+                                    STATE.setHeaderText("sorry");
+                                    STATE.setContentText("Sorry for this but your data is lost ");
+                                    ButtonType backToMainWindow = new ButtonType("close application");
+                                    STATE.getButtonTypes().setAll(backToMainWindow);
+                                    Optional<ButtonType> result = STATE.showAndWait();
+                                    System.exit(0);
+                                }
+                            });
                 }
             }
         }
@@ -987,13 +1022,15 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 req.setUserName(userameTextFld.getText());
                 req.setPassWord(passwordFld.getText());
                 try {
-                    System.out.println(req.getRequestType());
 
                     printStream.writeObject(req);
-                    System.out.println("Sign up request sent");
+                    //System.out.println("Sign up request sent");
 
                 } catch (IOException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    Alert serverError = new Alert(Alert.AlertType.ERROR);
+                    serverError.setTitle("Server Error");
+                    serverError.setContentText("couldn't connect to server, maybe it's offline or something is wrong");
+                    serverError.showAndWait();
                 }
 
                 
@@ -1003,7 +1040,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 passwordFld.setText("");
             } else if (((Control) e.getSource()).getId() == "signInBackButton") {
                 isSignIn = true;
-                System.out.println("back is pressed");
+                //System.out.println("back is pressed");
                 currentScene = landingWindowScene;
                 ps.setScene(landingWindowScene);
             }
@@ -1014,7 +1051,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             
             Integer rowPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(10) );
             Integer colPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(11) );
-            System.out.println("row "+rowPressed+" col "+colPressed+" is pressed by "+ currentPlayersData[0]);
+            //System.out.println("row "+rowPressed+" col "+colPressed+" is pressed by "+ currentPlayersData[0]);
             if(PlayMode.equals("human")){
                 if(playFlag){
                     // Player X case handling   
@@ -1028,13 +1065,12 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                    moveReq.setGameBoard(gameBoard);
                    moveReq.setPlayer1Name(Player1Name);
                    moveReq.setPlayer2Name(Player2Name);
-                    gameWinInit(currentPlayersData[0],gameBoard);
+                   gameWinInit(currentPlayersData[0],gameBoard);
                    currentScene=gameScene;
                    ps.setScene(currentScene);
                    ps.show(); 
                    playFlag=!playFlag;
                     try {
-                       
                         printStream.writeObject(moveReq);
                     } catch (IOException ex) {
                         Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
@@ -1214,7 +1250,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
        chatTextarea.appendText(msg);
        tf.setText("");
        
-       System.out.println("Sending sendMsg request");
+       //System.out.println("Sending sendMsg request");
        
      }
 }

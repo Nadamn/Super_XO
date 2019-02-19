@@ -17,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.BorderPane;
@@ -95,7 +96,11 @@ public class Server extends Application {
 
                                 }
                                 catch( Exception e){
-                                    e.printStackTrace();
+                                    Alert serverError = new Alert(Alert.AlertType.ERROR);
+                                    serverError.setTitle("Server Error");
+                                    serverError.setContentText("port is used");
+                                    serverError.showAndWait();
+                                    System.exit(0);
                                    }
                            
                         }
@@ -107,7 +112,7 @@ public class Server extends Application {
             buttonStop.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                         public void handle(ActionEvent event) {
-                            System.out.println("stop!");
+                            //System.out.println("stop!");
                             myServ.close();
                             System.exit(0);
                         }
@@ -206,13 +211,10 @@ public class Server extends Application {
                 System.out.println("ff");
                 try{
                     myServ.close();
-
                     System.exit(0);
 
                 }catch( Exception e){
-                    System.out.println("exc");
                     System.exit(0);
-                     e.printStackTrace();
                 }
             }
         });
@@ -225,7 +227,6 @@ public class Server extends Application {
      */
     public static void main(String[] args) {
 
-        System.out.println("hello");
         launch(args);
         
         
