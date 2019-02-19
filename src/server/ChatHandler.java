@@ -55,7 +55,7 @@ class ChatHandler extends Thread {
     
     public void run(){
     
-       // System.out.println("connection stablished");
+       
         while(true)
         {
             try{
@@ -72,11 +72,7 @@ class ChatHandler extends Thread {
                    
                     
             }
-//            catch (IOException ex) {
-//                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (java.lang.Exception ex) {
-//                Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+
 
             catch(Exception e){
                 
@@ -250,11 +246,7 @@ class ChatHandler extends Thread {
                 for(ChatHandler ch: clients)
                 {   
                     if (ch.getUserName().equals(mess.getDistUserName()))
-                    {  // System.out.println("1sa");
-//                        System.out.println("we found");
-//                        System.out.println("FFFFFFFFFFFFF");
-//                        System.out.println(mess.getUserName());
-//                        System.out.println(mess.getDistUserName());
+                    {  
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation request"); 
@@ -376,6 +368,29 @@ class ChatHandler extends Thread {
                 }
             }
                 break;
+                
+                
+                
+            case "sendMsg": {
+             String toUser= mess.getDistUserName();
+             String fromUser= mess.getUserName();
+             String message=mess.getChatMsg();
+             System.out.println("Got send message request");
+             
+                     for(ChatHandler ch: clients)
+                {   
+                    if (ch.getUserName().equals(mess.getDistUserName()))
+                    { 
+                        Response rr=new Response();
+                        rr.setUserName(fromUser);
+                        rr.setDestUsername(toUser);
+                        rr.setReponseType("recieveMsg"); 
+                        rr.setMessage(message);
+                        ch.ps.writeObject(rr);}
+                }
+            }
+             break;
+               
                 
                 
               case "moveToO":
@@ -535,10 +550,14 @@ class ChatHandler extends Thread {
          int NumofMoves=0;
          
          
-         for(int i=0;i<3;i++)
-           for(int j=0;j<3;j++)
+         for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
                if(board[i][j]==1 || board[i][j]==0)
                    NumofMoves++;
+            }
+               
+         }
+           
          
         // Check for horizontal
           if ( (board[lastMoveRow][0] == board[lastMoveRow][2])&& (board[lastMoveRow][1] == board[lastMoveRow][2]) && (board[lastMoveRow][0] == board[lastMoveRow][lastMoveCol]) )
@@ -565,7 +584,13 @@ class ChatHandler extends Thread {
         
         
         // Check for diagonal (check later)
-        
+        if ((board[0][0]==board[1][1] && board[1][1]==board[2][2]) || (board[2][0]==board[1][1] && board[1][1]==board[0][2]))
+        {
+            if (board[1][1]==1)
+                return "1wins";
+            if (board[1][1]==0)
+                return "2wins";
+        }
         
         
         // Check for tie case 

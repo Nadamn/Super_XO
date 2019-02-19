@@ -30,6 +30,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
@@ -86,6 +87,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     String Player2Name;
     String PlayMode;
     Board machineBoard;
+    TextArea chatTextarea=new TextArea();
+    TextField tf=new TextField();;
     boolean newGameFlag=true;
 
     //------------------------------ Colors --------------------------------------------------------------------------    
@@ -307,6 +310,18 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             });
 
         }
+        
+        else if(r.getReponseType().equals("recieveMsg") ){
+         String message= r.getMessage();
+         
+         ////////////////////////
+              Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                chatTextarea.appendText(message);}
+            });
+       
+        }
 
         else if (r.getReponseType().equals("receiveInO")){
             
@@ -367,8 +382,10 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     Optional<ButtonType> result = STATE.showAndWait();
                      if (result.get() == backToMainWindow){
                          ///// Add lines to update status on server from busy to free
+                         chatTextarea.setText("");
                          newGameFlag=true;
                          gameBoard=newGameInitArr;
+                         chatTextarea.setText("");
                         // renderButtons(gameBoard);
                         gameWinInit(currentPlayersData[0],gameBoard);
                          currentScene=mainWindowScene;
@@ -398,7 +415,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                      if (result.get() == backToMainWindow){
                          ///// Add lines to update status on server from busy to free
                          newGameFlag=true;
-                         
+                         chatTextarea.setText("");
                          gameBoard=newGameInitArr;
                          //renderButtons(gameBoard);
                          gameWinInit(currentPlayersData[0],gameBoard);
@@ -414,7 +431,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         
         }
         
-        else if (r.getReponseType().equals("tie"))
+        else if (r.getReponseType().equals("TIE"))
         {
             
             Platform.runLater(new Runnable() {
@@ -430,7 +447,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                      if (result.get() == backToMainWindow){
                          ///// Add lines to update status on server from busy to free
                          newGameFlag=true;
-                        
+                         chatTextarea.setText("");
                          gameBoard=newGameInitArr;
                          //renderButtons(gameBoard);
                           gameWinInit(currentPlayersData[0],gameBoard);
@@ -668,11 +685,18 @@ public class Client extends Application implements EventHandler<ActionEvent> {
    
     
     public void gameWinInit(String name,int x[][]) {
-        
+              
         if (newGameFlag && PlayMode.equals("human")){
          x=new int[][]{{2,2,2},{2,2,2},{2,2,2}};
          gameBoard=x;
         }
+        
+        ///////////////////////////////////////////////////////////
+       // tf=new TextField();
+         //chatTextarea=new TextArea();
+        Button sendBtn;
+        VBox vbox;
+        ///////////////////////////////////////////////////////
         
         
         BorderPane borderPane;
@@ -712,45 +736,58 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         }  
      
      
-        newGame = new Button("New Game");
-        newGame.setOnAction((EventHandler<ActionEvent>) this);
-        newGame.setId("newGame");
-
-        quitGame = new Button("Quit Game");
-        quitGame.setOnAction((EventHandler<ActionEvent>) this);
-        quitGame.setId("quitGame");
-
-        signOut = new Button("Sign Out");
-        signOut.setOnAction((EventHandler<ActionEvent>) this);
-        signOut.setId("signOut");
+        //////////////////////////////////
+        chatTextarea.setEditable(false);
+        chatTextarea.prefHeight(400);
+        chatTextarea.prefWidth(400);
+        sendBtn=new Button("Send");
+        sendBtn.setId("sendMsg");
+        
+        sendBtn.setOnAction(new EventHandler<ActionEvent>(){
+        public void handle (ActionEvent event){
+            //public void sendMsg(String msg,String fromPlayer,String toPlayer) throws IOException{
+           if(! tf.getText().isEmpty()){
+           
+               try {
+                   
+                
+                   
+                   if(isPlayerTypeX)
+                   {
+                       sendMsg(tf.getText(),currentPlayersData[0],Player2Name);
+                   
+                   }
+                   
+                   else 
+                   {
+                       
+                       sendMsg(tf.getText(),currentPlayersData[0],Player1Name);
+                   }
+                   
+                       
+               } catch (IOException ex) {
+                   Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+               }
+                 
+           }
+        }
+        });
+        vbox=new VBox(20,chatTextarea,tf,sendBtn);
+        vbox.setPrefSize(400,320);
+        ///////////////////////////////////
 
         btnsPane = new FlowPane(Orientation.VERTICAL);
         borderPane = new BorderPane();
-        //gamePane = new GridPane();
-        btnsPane.getChildren().addAll(newGame, quitGame, signOut);
-        btnsPane.setColumnHalignment(HPos.LEFT);
-        btnsPane.setAlignment(Pos.CENTER);
-        btnsPane.setVgap(50);
-        borderPane.setLeft(btnsPane);
-        borderPane.setCenter(gamePane);
-
+        borderPane.setLeft(gamePane);
         borderPane.setTop(userName);
-        
-        
+        borderPane.setCenter(vbox);
         gamePane.setHgap(5);
         gamePane.setVgap(5);
-        gamePane.setAlignment(Pos.CENTER);
-        gameScene = new Scene(borderPane, 500, 320);
+        gameScene = new Scene(borderPane, 800,330 );
         
         newGameFlag=false;
         
     }
-
-    
-
-        
-    
-
     // Signin window init
     public void signInWinInit() {
         Button signInSubmitButton;
@@ -849,6 +886,8 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 newGameFlag=true;
                 PlayMode="human";
                 playFlag=false;
+                Player1Name=r.getUserName();
+                Player2Name=r.getDestUsername();
                 isPlayerTypeX=false;
                 System.out.println("Hello I accepted the invitaion!!!");
                 gameBoard=newGameInitArr;
@@ -942,7 +981,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             }
         } 
         
-        else if (currentScene==gameScene) {
+        else if (currentScene==gameScene &&  !((Control) e.getSource()).getId().equals("sendMsg") ) {
             
             Integer rowPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(10) );
             Integer colPressed=Character.getNumericValue(   ((Control) e.getSource()).getId().charAt(11) );
@@ -1025,10 +1064,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     Optional<ButtonType> result = STATE.showAndWait();
                      if (result.get() == backToMainWindow){
                          ///// Add lines to update status on server from busy to free
-                         //newGameFlag=true;
-                        
-                         gameBoard=newGameInitArr;
                        
+                         gameBoard=newGameInitArr;
+                         chatTextarea.setText("");
                          gameWinInit(currentPlayersData[0],machineBoard.board);
                          currentScene=mainWindowScene;
                          ps.setScene(currentScene);
@@ -1050,9 +1088,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     Optional<ButtonType> result = STATE.showAndWait();
                      if (result.get() == backToMainWindow){
                          
-                         //newGameFlag=true;
+                         
                          gameBoard=newGameInitArr;
-                      
+                         chatTextarea.setText("");
                          gameWinInit(currentPlayersData[0],machineBoard.board);
                          currentScene=mainWindowScene;
                          ps.setScene(currentScene);
@@ -1076,8 +1114,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                     STATE.getButtonTypes().setAll(backToMainWindow);
                     Optional<ButtonType> result = STATE.showAndWait();
                      if (result.get() == backToMainWindow){
-                        
-                         //newGameFlag=true;
+                        chatTextarea.setText("");
                          gameBoard=newGameInitArr;
                          gameWinInit(currentPlayersData[0],machineBoard.board);
                          currentScene=mainWindowScene;
@@ -1134,4 +1171,22 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         }
     }
 
+    
+     public void sendMsg(String msg,String fromPlayer,String toPlayer) throws IOException{
+      
+       
+      Request msgReq= new Request();
+      msgReq.setRequestType("sendMsg");
+      msgReq.setUserName(fromPlayer);
+      msgReq.setDistUserName(toPlayer);
+      
+      msg = fromPlayer+": "+msg+"\n";
+      msgReq.setChatMsg(msg); 
+       printStream.writeObject(msgReq);
+       chatTextarea.appendText(msg);
+       tf.setText("");
+       
+       System.out.println("Sending sendMsg request");
+       
+     }
 }
