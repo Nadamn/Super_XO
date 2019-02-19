@@ -36,7 +36,7 @@ public class DBManager {
     public Vector<Player> getAllPlayers() {
         Vector<Player> players = new Vector<>();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM player"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM player ORDER BY score DESC"); // rememer to implement (ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE) if there will be time
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Player pl = new Player(rs.getString(2), rs.getString(3));
@@ -132,6 +132,13 @@ public class DBManager {
         } catch (SQLException ex) {
             System.out.println("couldn't execute query, get player failed");
             return null;
+        }
+    }
+    
+    public static void main(String[] args) {
+        DBManager db = new DBManager();
+        for (Player p: db.getAllPlayers()){
+            System.out.println(p.getUsername());
         }
     }
 

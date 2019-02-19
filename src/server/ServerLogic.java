@@ -8,6 +8,7 @@ package server;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import static server.Server.users;
 
 /**
  *
@@ -24,14 +25,21 @@ public class ServerLogic extends Thread{
     ArrayList<String> users  ;
     ArrayList<Integer> status ;
     ArrayList<String> passwords ;
-    
+    ArrayList<Integer> scores ;
     DBManager db;
     
-    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  ,DBManager db){
+    public ServerLogic(ArrayList<String> u ,ArrayList<Integer> s ,ArrayList<String> p  , ArrayList<Integer> sco,DBManager db){
         users = u;
         status = s;
         passwords = p;
+        scores =sco ;
         this.db=db;
+        
+             for( int j=0 ; j < users.size() ;j++ ){
+            System.out.println(users.get(j) );
+            System.out.println(scores.get(j));
+
+        }
         
         //launch(ar);
    

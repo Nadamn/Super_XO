@@ -74,6 +74,8 @@ class ChatHandler extends Thread {
                     Response r2 = new Response();
                     int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                     String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
+                    int[] sco = Server.myServ.scores.stream().mapToInt(j -> j).toArray();
+                    r2.setScores(sco);
                     r2.setReponseType("status update");
                     r2.setUsers(names);
                     r2.setStatus(arr);
@@ -116,7 +118,8 @@ class ChatHandler extends Thread {
                             String[] playerData = {currentPlayer.getUsername(), currentPlayer.getScore().toString()};
                             r.setReponseStatus(true);
                             r.setReponseType("signin");
-
+                            int[] sco = Server.myServ.scores.stream().mapToInt(j -> j).toArray();
+                            r.setScores(sco);
                             this.setUserName(mess.getUserName());
                             String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                             int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
@@ -134,6 +137,7 @@ class ChatHandler extends Thread {
                             r2.setReponseType("status update");
                             r2.setUsers(names);
                             r2.setStatus(arr);
+                            r2.setScores(sco);
                             for (ChatHandler ch2 : clients) {
 
                                 //System.out.println(r2.getStatus());
@@ -198,6 +202,8 @@ class ChatHandler extends Thread {
 
                     int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                     String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
+                    int[] sco = Server.myServ.scores.stream().mapToInt(j -> j).toArray();
+                    r.setScores(sco);
                     r.setStatus(arr);
                     r.setUsers(names);
 
@@ -206,7 +212,7 @@ class ChatHandler extends Thread {
                     r2.setReponseType("status update");
                     r2.setUsers(names);
                     r2.setStatus(arr);
-
+                    r2.setScores(sco);
                     for (ChatHandler ch2 : clients) {
                         //System.out.println(r2.getStatus());
                         if (!ch2.username.equals(mess.getUserName())) {
@@ -234,6 +240,8 @@ class ChatHandler extends Thread {
                         int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                         String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                         arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        int[] sco = Server.myServ.scores.stream().mapToInt(j -> j).toArray();
+                        r2.setScores(sco);
                         r2.setReponseType("status update");
                         r2.setUsers(names);
                         r2.setStatus(arr);
@@ -300,6 +308,8 @@ class ChatHandler extends Thread {
                         Response r2 = new Response();
                         int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                         String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
+                        int[] sco = Server.myServ.scores.stream().mapToInt(j -> j).toArray();
+                        r2.setScores(sco);
                         arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                         r2.setReponseType("status update");
                         r2.setUsers(names);

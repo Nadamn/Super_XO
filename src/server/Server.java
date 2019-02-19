@@ -52,6 +52,7 @@ public class Server extends Application {
     static ArrayList<String> users = new ArrayList();
     static ArrayList<Integer> status = new ArrayList();
     static ArrayList<String> passwords = new ArrayList();
+    static ArrayList<Integer> scores = new ArrayList(); 
     static ArrayList<Circle> options;
     
     
@@ -64,6 +65,7 @@ public class Server extends Application {
         users.add(p.getUsername());
         status.add(1);
         passwords.add(p.getPassWord());
+        scores.add(0);
        
     }
     
@@ -187,9 +189,13 @@ public class Server extends Application {
     @Override
     public void start(Stage primaryStage) {
         for( int j=0 ; j < allPlayers.size() ;j++ ){
+            System.out.println(allPlayers.get(j).getUsername() );
+            System.out.println(allPlayers.get(j).getScore());
+
             users.add( allPlayers.get(j).getUsername() );
             status.add( allPlayers.get(j).getStatus());  
             passwords.add(allPlayers.get(j).getPassWord());
+            scores.add(allPlayers.get(j).getScore());
         }
         
         BorderPane border = new BorderPane();
@@ -204,7 +210,7 @@ public class Server extends Application {
         primaryStage.setTitle("X_O Server");
         primaryStage.setScene(scene);
         primaryStage.show();
-        myServ = new ServerLogic( users , status , passwords,db);
+        myServ = new ServerLogic( users , status , passwords , scores,db);
         
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
             public void handle( WindowEvent close){
