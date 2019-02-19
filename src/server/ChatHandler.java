@@ -97,7 +97,7 @@ class ChatHandler extends Thread {
                     //sendToAll("client removed");
                     break;
                 } catch (IOException ex) {
-                    Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("failed to close resourcers");
                }
         }
 
@@ -112,9 +112,6 @@ class ChatHandler extends Thread {
         } 
     }
 
-    private void Exception(String anull) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     
     
     public void handleRequest(Request mess) throws IOException{
@@ -135,7 +132,7 @@ class ChatHandler extends Thread {
                                 found = true;
                                 if( Server.myServ.passwords.get(i).equals(mess.getPassWord()))
                                 {       
-                                    // return true 
+                                  
                                     Player currentPlayer = DB.getPlayer(mess.getUserName());
                                     String [] playerData = {currentPlayer.getUsername(), currentPlayer.getScore().toString()};
                                     r.setReponseStatus(true);
@@ -150,8 +147,6 @@ class ChatHandler extends Thread {
                                     
                                     //  update status in server
                                     Server.updateStatus(mess.getUserName(),1);
-//                                    System.out.println("response sent");
-//                                    System.out.println(DB.getPlayer(mess.getUserName()).getScore());
 
                                     // update clients with new updates
                                     Response r2 =  new Response();
@@ -162,11 +157,10 @@ class ChatHandler extends Thread {
                                     r2.setStatus(arr);
                                     for( ChatHandler ch2 : clients)
                                         {
-                                            System.out.println("inner loop");
-                                            System.out.println(r2.getStatus());
+                                        
+                                            //System.out.println(r2.getStatus());
                                             if( !ch2.username.equals(mess.getUserName()))
                                                 {
-                                                    System.out.println("sent loop");
                                                     ch2.ps.writeObject(r2);
                                                 } 
                                         }
@@ -235,7 +229,6 @@ class ChatHandler extends Thread {
 
 
                             int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
-                            //String[] names = Server.myServ.users.toArray();
                             String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                             r.setStatus(arr);
                             r.setUsers(names);
@@ -245,16 +238,12 @@ class ChatHandler extends Thread {
                             r2.setReponseType("status update");
                             r2.setUsers(names);                       
                             r2.setStatus(arr);
-                            for (int i = 0; i < r2.getUsers().length; i++) {
-                                System.out.println(r2.getUsers()[i]);
-                                 
-                             }
+
                             for( ChatHandler ch2 : clients)
                                 {
-                                    System.out.println(r2.getStatus());
+                                    //System.out.println(r2.getStatus());
                                     if( !ch2.username.equals(mess.getUserName()) )
                                         {
-                                            System.out.println("sent loop");
                                             ch2.ps.writeObject(r2);
                                         } 
                                 }
@@ -266,11 +255,8 @@ class ChatHandler extends Thread {
                 break;
             case "invite":
             { 
-//                System.out.println("invite request is recieved");
-//                System.out.println("I am "+mess.getUserName()+" and looking for "+ mess.getDistUserName());
-//                System.out.println("WWWWWWWWW");
-                
-                System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
+         
+                //System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
         
                 
                 
@@ -295,15 +281,14 @@ class ChatHandler extends Thread {
                         r2.setStatus(arr);
                         for( ChatHandler ch2 : clients)
                             {
-                                System.out.println(r2.getStatus());
+                                //System.out.println(r2.getStatus());
                                 if( !ch2.username.equals(mess.getUserName()) && !ch2.username.equals(mess.getDistUserName()))
                                     {
-                                        System.out.println("sent loop");
                                         ch2.ps.writeObject(r2);
                                     } 
                             }
                         
-                        System.out.println("invitaion sent to client 2");
+                        //System.out.println("invitaion sent to client 2");
 
 
                         break;
@@ -316,7 +301,7 @@ class ChatHandler extends Thread {
             case "cancel invitation":
             { 
             
-                System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
+                //System.out.println(" I am the server I got "+ mess.getRequestType() + "request from "+ mess.getUserName() + "To "+mess.getDistUserName());
             
                 for(ChatHandler ch: clients)
                 {   
@@ -327,7 +312,7 @@ class ChatHandler extends Thread {
                         r.setReponseType("cancel invitation"); 
                         ch.ps.writeObject(r);
 
-                        System.out.println("cancel invitation sent to client 2");
+                        //System.out.println("cancel invitation sent to client 2");
 
                         break;
                     }
@@ -344,23 +329,15 @@ class ChatHandler extends Thread {
                 {
                     if (ch.getUserName().equals(mess.getDistUserName()))
                     {
-                        System.out.println(mess.getUserName());
-
-                        
                         r.setUserName(mess.getUserName());
                         r.setDestUsername(mess.getDistUserName());
                         r.setReponseType("invitation response"); 
                         r.setInvitationReply(mess.getInvitationReply());
-                        System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
+                        //System.out.println("I am server sending "+ r.getReponseType() +  "to "+mess.getDistUserName());
 
-                        //ch.ps.writeObject(r);
                         // Cheking if player 2 accepted the invitation or not 
                         if (r.getInvitationReply())   //if yes we need to instantiate game object
                             {
-//                                g=new Game(mess.getDistUserName(),mess.getUserName(),quickGameInitArr); 
-//                                Server.updateStatus(mess.getUserName(),2);
-//                                Server.updateStatus(mess.getDistUserName(),2);
-                                
                                 
                                 r.setPlayer1Name(mess.getDistUserName());
                             r.setPlayer2Name(mess.getUserName());
@@ -388,10 +365,9 @@ class ChatHandler extends Thread {
                         r2.setStatus(arr);
                         for( ChatHandler ch2 : clients)
                             {
-                                System.out.println(r2.getStatus());
+                                //System.out.println(r2.getStatus());
                                 if( !ch2.username.equals(mess.getUserName()) && !ch2.username.equals(mess.getDistUserName()))
                                     {
-                                        System.out.println("sent loop");
                                         ch2.ps.writeObject(r2);
                                     } 
                             }
@@ -408,7 +384,7 @@ class ChatHandler extends Thread {
              String toUser= mess.getDistUserName();
              String fromUser= mess.getUserName();
              String message=mess.getChatMsg();
-             System.out.println("Got send message request");
+             //System.out.println("Got send message request");
              
                      for(ChatHandler ch: clients)
                 {   
@@ -434,7 +410,7 @@ class ChatHandler extends Thread {
                 gameRes.setGameBoard(mess.getGameBoard());
                 gameRes.setPlayer1Name(mess.getPlayer1Name());
                 gameRes.setPlayer2Name(mess.getPlayer2Name());
-                System.out.println("Got the first move");
+                //System.out.println("Got the first move");
                   for(ChatHandler ch: clients){
                      // if (ch.getUserName().equals(g.getPlayer2Name()))
                      if (ch.getUserName().equals(mess.getPlayer2Name()))
@@ -547,14 +523,14 @@ class ChatHandler extends Thread {
             
             case "set username":
             { 
-                System.out.println("invite request is recieved");
+                //System.out.println("invite request is recieved");
                 this.username = r.getUserName();
             }
         }
         
      if (mess.getRequestType().equals("signInSubmit") || mess.getRequestType().equals("signUpSubmit") || mess.getRequestType().equals("set username")) 
      {
-         System.out.println("I am server sending "+ r.getReponseType() +  "to "+r.getDestUsername());
+         //System.out.println("I am server sending "+ r.getReponseType() +  "to "+r.getDestUsername());
      this.ps.writeObject(r);
      
      }
@@ -582,7 +558,7 @@ class ChatHandler extends Thread {
                     clients.remove(ch);
                     ch.s.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(ChatHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("client unreachable");
                 }
         } 
         System.out.println("all users removed");
