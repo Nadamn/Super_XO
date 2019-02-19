@@ -41,8 +41,8 @@ import static server.ChatHandler.clients;
 public class Server extends Application {
    
     //players from db
-    public DBManager db = new DBManager();
-    private Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
+    public static DBManager db = new DBManager();
+    private static Vector<Player> allPlayers = new Vector<>(db.getAllPlayers());
     
     static String[] ar;
     static Color red = Color.RED;
@@ -50,13 +50,21 @@ public class Server extends Application {
     static Color gray = Color.LIGHTGREY;
     static ArrayList<String> users = new ArrayList();
     static ArrayList<Integer> status = new ArrayList();
-    ArrayList<String> passwords = new ArrayList();
+    static ArrayList<String> passwords = new ArrayList();
     static ArrayList<Circle> options;
     
     
     //String users[] =  new String[]{ "Abdelrahman" , "Bahaa" , "David" , "Mostafa" , "Nada"};
     //int status[] = new int[]{ 2 , 1 , 1 , 0 , 2};     // 0 : off      1:on    2:busy 
     static ServerLogic myServ ;
+    
+    public static void updateUsers(Player p){
+        allPlayers.add(p);
+        users.add(p.getUsername());
+        status.add(1);
+        passwords.add(p.getPassWord());
+       
+    }
     
     public static Color state(int s){
         switch (s){

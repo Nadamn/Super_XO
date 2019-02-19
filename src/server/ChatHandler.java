@@ -89,8 +89,9 @@ class ChatHandler extends Thread {
                     
                     Response r2 =  new Response();
                     int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                    String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                     r2.setReponseType("status update");
-                    r2.setUsers(Server.myServ.users);                       
+                    r2.setUsers(names);                       
                     r2.setStatus(arr);
                     for( ChatHandler ch2 : clients)
                         {
@@ -143,11 +144,11 @@ class ChatHandler extends Thread {
                                     String [] playerData = {currentPlayer.getUsername(), currentPlayer.getScore().toString()};
                                     r.setReponseStatus(true);
                                     r.setReponseType("signin");
-                                    r.setUsers(Server.myServ.users);
+                                    
                                     this.setUserName(mess.getUserName());
-                                    
+                                    String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                                     int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
-                                    
+                                    r.setUsers(names);
                                     r.setStatus(arr);
                                     r.setCurrentPlayerData(playerData);
                                     
@@ -159,8 +160,9 @@ class ChatHandler extends Thread {
                                     // update clients with new updates
                                     Response r2 =  new Response();
                                     arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                                    
                                     r2.setReponseType("status update");
-                                    r2.setUsers(Server.myServ.users);                       
+                                    r2.setUsers(names);                       
                                     r2.setStatus(arr);
                                     for( ChatHandler ch2 : clients)
                                         {
@@ -220,10 +222,9 @@ class ChatHandler extends Thread {
                             r.setReponseStatus(true);
                             r.setReponseType("signup");
                             r.setMessage("SignUp Sucessfully");
-                            r.setUsers(Server.myServ.users);
+                            
 //                            r.setStatus(Server.myServ.status);
-                           int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
-                           r.setStatus(arr);
+                           
                             
 
                             this.setUserName(mess.getUserName());
@@ -233,6 +234,36 @@ class ChatHandler extends Thread {
                             Player p=new Player(mess.getUserName(),mess.getPassWord());
                             boolean s=DB.createNewPlayer(p);
                           
+                            //let users and status in server load from db 
+                            Server.updateUsers(p);
+
+
+                            int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                            //String[] names = Server.myServ.users.toArray();
+                            String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
+                            r.setStatus(arr);
+                            r.setUsers(names);
+                            
+                            Response r2 =  new Response();
+                         
+                            r2.setReponseType("status update");
+                            r2.setUsers(names);                       
+                            r2.setStatus(arr);
+                            for (int i = 0; i < r2.getUsers().length; i++) {
+                                System.out.println(r2.getUsers()[i]);
+                                 
+                             }
+                            for( ChatHandler ch2 : clients)
+                                {
+                                    System.out.println(r2.getStatus());
+                                    if( !ch2.username.equals(mess.getUserName()) )
+                                        {
+                                            System.out.println("sent loop");
+                                            ch2.ps.writeObject(r2);
+                                        } 
+                                }
+
+                            
                         } 
             }
                 
@@ -265,9 +296,10 @@ class ChatHandler extends Thread {
 
                         Response r2 =  new Response();
                         int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                         arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                         r2.setReponseType("status update");
-                        r2.setUsers(Server.myServ.users);                       
+                        r2.setUsers(names);                       
                         r2.setStatus(arr);
                         for( ChatHandler ch2 : clients)
                             {
@@ -357,9 +389,10 @@ class ChatHandler extends Thread {
 
                         Response r2 =  new Response();
                         int[] arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
+                        String[] names = Server.myServ.users.toArray(new String[Server.myServ.users.size()]);
                         arr = Server.myServ.status.stream().mapToInt(j -> j).toArray();
                         r2.setReponseType("status update");
-                        r2.setUsers(Server.myServ.users);                       
+                        r2.setUsers(names);                       
                         r2.setStatus(arr);
                         for( ChatHandler ch2 : clients)
                             {

@@ -101,7 +101,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
 
     //---------------------------------variables for main window --------------------------------------------------
     Boolean mainWinFlag = false;
-    ArrayList<String> usernames = new ArrayList<>();
+    String[] usernames;
     int[] playersStatus;
     Map<String, Color> allPlayers = new HashMap<>();
     String[] currentPlayersData = {};
@@ -110,6 +110,7 @@ public class Client extends Application implements EventHandler<ActionEvent> {
     Alert invitationDeclined = new Alert(Alert.AlertType.INFORMATION);
     Boolean player1Cancelled = false;
     Alert STATE = new Alert(Alert.AlertType.CONFIRMATION);
+    Alert STATE2 = new Alert(Alert.AlertType.CONFIRMATION);
 
     public Boolean connectToServer() {
         finish = false;
@@ -186,9 +187,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         usernames = r.getUsers();
                         playersStatus = r.getStatus();
                         currentPlayersData = r.getCurrentPlayerData();
-                        for (int i = 0; i < usernames.size(); i++) {
-                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus[i]));
-                            System.out.println(usernames.get(i));
+                        for (int i = 0; i < usernames.length; i++) {
+                            allPlayers.put(usernames[i], server.Server.state(playersStatus[i]));
+                            System.out.println(usernames[i]);
                         }
 
                         initMainWindow();
@@ -223,9 +224,9 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                         playersStatus = r.getStatus();
                         currentPlayersData = r.getCurrentPlayerData();
                         System.out.println("SIGN UP TEST CURRENT USER NAME" + currentPlayersData[0]);
-                        for (int i = 0; i < usernames.size(); i++) {
-                            allPlayers.put(usernames.get(i), server.Server.state(playersStatus[i]));
-                            System.out.println(usernames.get(i));
+                        for (int i = 0; i < usernames.length; i++) {
+                            allPlayers.put(usernames[i], server.Server.state(playersStatus[i]));
+                            System.out.println(usernames[i]);
                         }
                         initMainWindow();
                         currentScene = mainWindowScene;
@@ -317,7 +318,6 @@ public class Client extends Application implements EventHandler<ActionEvent> {
                 }
             });
         } else if (r.getReponseType().equals("server closed")) {
-            //handle this ya nadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
             System.out.println("server closed");
             Platform.runLater(new Runnable() {
                 @Override
@@ -422,9 +422,13 @@ public class Client extends Application implements EventHandler<ActionEvent> {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    allPlayers.clear();
-                    for (int i = 0; i < r.getUsers().size(); i++) {
-                        allPlayers.put(r.getUsers().get(i), server.Server.state(r.getStatus()[i]));
+                    allPlayers.clear();                 
+                    for (int i = 0; i < r.getUsers().length; i++) {
+                                System.out.println(r.getUsers()[i]);
+                                 
+                             }
+                    for (int i = 0; i < r.getUsers().length; i++) {
+                        allPlayers.put(r.getUsers()[i], server.Server.state(r.getStatus()[i]));
                     }
                     initMainWindow();
                     currentScene = mainWindowScene;
