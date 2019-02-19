@@ -34,14 +34,9 @@ public class ServerLogic extends Thread{
         this.db=db;
         
         //launch(ar);
-        try{
+   
         finish = false;
-        
-        
-        }
-        catch( Exception e){
-            e.printStackTrace();
-           }
+       
            
            
     }
@@ -49,17 +44,15 @@ public class ServerLogic extends Thread{
     public void run(){
     
         try{
-            System.out.println("hell1");
             myserver = new ServerSocket(5001);
             while(!finish){
-                System.out.println("hell");
                 Socket s = myserver.accept();
                 new ChatHandler(s,db);
             }
         }
         catch( Exception e)
         {
-            e.printStackTrace();
+            System.out.println("client closed the connection");
         }
     }
     
