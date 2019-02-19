@@ -484,9 +484,31 @@ public class Client extends Application implements EventHandler<ActionEvent> {
         BorderPane mainWindowPane = new BorderPane();
 
         //----------------------------top bar-------------------------------------------------------------------------------------//
-        Button signOutButton = new Button("Sign Out");
-        signOutButton.setId("signOut");
-        signOutButton.setOnAction((EventHandler<ActionEvent>) this);
+        Button signOutButton = new Button("Exit");
+        signOutButton.setId("Exit");
+        signOutButton.setOnAction((EventHandler<ActionEvent>) ((ActionEvent event) -> {
+
+                            Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                initMainWindow();  
+                                STATE2.setTitle("exit" );
+                                STATE2.setHeaderText("Exit the SuperXo");
+                                STATE2.setContentText("good bye ");
+                                ButtonType backToMainWindow = new ButtonType("close application");
+                                STATE2.getButtonTypes().setAll(backToMainWindow);
+                                Optional<ButtonType> result = STATE2.showAndWait();
+                                try {
+                                    printStream.close();
+                                    dataInStream.close();
+                                    mySocket.close();
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                System.exit(0);              
+                            }
+                            });
+            }));
         signOutButton.setPrefSize(170, 30);
 
         Text name = new Text("Welcome " + currentPlayersData[0]);
